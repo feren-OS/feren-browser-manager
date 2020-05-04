@@ -1,0 +1,69 @@
+#!/bin/bash
+
+
+
+################
+#Check for root#
+################
+if [ ! $USERNAME = "root" ]; then
+    gksudo --description="Web Browser Manager" /usr/share/browser-manager/firefox/uninstall
+    exit 0
+fi
+
+##########
+#Question#
+##########
+zenity --question --title="Continue?" --text "Are you sure you want to continue?"
+
+if [ ! $? -eq 0 ]; then
+           exit
+fi
+
+###################################
+#Check if program is not installed#
+###################################
+dpkg --get-selections | grep -P -q "firefox\t*install"
+
+if [ ! $? -eq 0 ]; then
+         if [ ! -e "/usr/bin/firefox" ]; then
+                  zenity --info --title="Information" --text="Firefox is not installed!"
+                  exit 0
+         fi
+fi
+
+###############################
+#Check if program is installed#
+###############################
+dpkg --get-selections | grep -P -q "firefox\t*install"
+
+if [ $? -eq 0 ]; then
+         if [ -e "/usr/bin/firefox" ]; then
+
+###################
+#Uninstall program#
+###################
+                  apt-get -y remove firefox | zenity --progress --title="Uninstalling..." --text="Uninstalling..." --pulsate --auto-close
+         fi
+         ######################
+         #Double Check Package#
+         ######################
+         dpkg --get-selections | grep -P -q "firefox\t*install"
+
+         if [ ! $? -eq 0 ]; then
+                  if [ ! -e "/usr/bin/firefox" ]; then
+                           zenity --info --title="Uninstalled Firefox" --text="Firefox uninstalled successfully!"
+                           exit 0
+                  fi
+                  #######
+                  #Error#
+                  #######
+                  zenity  --error --text="An error occured." --title="Error"
+                  exit 0
+         fi
+fi
+
+#######
+#Error#
+#######
+zenity  --error --text="An error occured." --title="Error"
+exit 0

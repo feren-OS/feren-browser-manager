@@ -1,0 +1,301 @@
+#!/usr/bin/python
+
+# This file is part of Zorin Web Browser Manager.
+#
+# Zorin Web Browser Manager is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Zorin Web Browser Manager is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Zorin Web Browser Manager.  If not, see <http://www.gnu.org/licenses/>.
+ 
+#(c) AZorin 2010-2015 <azorin@zoringroup.com>
+#(c) Zorink 2010 <zorink@zoringroup.com>
+#
+# Easily install and uninstall web browsers in Zorin OS.
+# This is free software made available under the GNU public license.
+
+from gi.repository import Gtk
+import os
+from os import path
+
+applogo = "/usr/share/pixmaps/browser-manager.svg"
+
+class BrowserManager(Gtk.Window):
+    def __init__(self):
+        super(BrowserManager, self).__init__()
+        
+        self.set_title("Zorin Web Browser Manager")
+        self.set_size_request(640, 220)
+        self.set_resizable(False)
+        self.set_icon_from_file(applogo)
+        self.set_position(Gtk.WindowPosition.CENTER)
+        self.connect("destroy", self.on_destroy)
+        
+        fixed = Gtk.Fixed()
+
+#####################
+# Adding the buttons#
+#####################
+
+        if os.path.isfile("/usr/bin/firefox"):
+            uninstfirefox = Gtk.Button("Uninstall")
+            uninstfirefox.connect("clicked", self.on_uninstfirefox)
+            uninstfirefox.set_size_request(87, 30)
+            
+            fixed.put(uninstfirefox, 30, 130)
+
+            uninstfirefox.set_tooltip_text("Uninstall Firefox")
+           
+        else:
+            instfirefox = Gtk.Button("Install")				
+            instfirefox.connect("clicked", self.on_instfirefox)
+            instfirefox.set_size_request(87, 30)
+
+            fixed.put(instfirefox, 30, 130)
+ 
+            instfirefox.set_tooltip_text("Install Firefox")
+
+        if os.path.isfile("/usr/bin/google-chrome"):
+            uninstchrome = Gtk.Button("Uninstall")			
+            uninstchrome.connect("clicked", self.on_uninstchrome)
+            uninstchrome.set_size_request(87, 30)
+
+            fixed.put(uninstchrome, 195, 130)
+
+            uninstchrome.set_tooltip_text("Uninstall Google Chrome")
+        else:        
+            chrome = Gtk.Button("Install")				
+            chrome.connect("clicked", self.on_instchrome)
+            chrome.set_size_request(87, 30)
+
+            fixed.put(chrome, 195, 130)
+
+            chrome.set_tooltip_text("Install Google Chrome")
+
+        if  os.path.isfile("/usr/bin/epiphany-browser"):
+            uninstweb = Gtk.Button("Uninstall")			
+            uninstweb.connect("clicked", self.on_uninstweb)
+            uninstweb.set_size_request(87, 30)
+
+            fixed.put(uninstweb, 360, 130)
+            
+            uninstweb.set_tooltip_text("Uninstall Web")
+        else:
+            web = Gtk.Button("Install")				
+            web.connect("clicked", self.on_instweb)
+            web.set_size_request(87, 30)
+
+            fixed.put(web, 360, 130)
+
+            web.set_tooltip_text("Install Web")
+     
+        if  os.path.isfile("/usr/bin/midori"):	
+            uninstmidori = Gtk.Button("Uninstall")		
+            uninstmidori.connect("clicked", self.on_uninstmidori)
+            uninstmidori.set_size_request(87, 30)
+ 
+            fixed.put(uninstmidori, 525, 130)
+
+            uninstmidori.set_tooltip_text("Uninstall Midori")
+        else:
+            instmidori = Gtk.Button("Install")			
+            instmidori.connect("clicked", self.on_instmidori)
+            instmidori.set_size_request(87, 30)
+
+            fixed.put(instmidori, 525, 130)
+
+            instmidori.set_tooltip_text("Install Midori")
+
+        close = Gtk.Button(stock=Gtk.STOCK_CLOSE)		
+        close.connect("clicked", self.on_close)
+        close.set_size_request(85, 30)
+
+        fixed.put(close, 545, 180)
+        
+############################
+# Adding the program titles#
+############################
+       
+        firefoxlabel = Gtk.Label()
+        chromelabel = Gtk.Label()
+        weblabel = Gtk.Label()
+        midorilabel = Gtk.Label()   
+
+        firefoxlabel.set_markup("<b>Firefox</b>")     
+        chromelabel.set_markup("<b>Google Chrome</b>")     
+        weblabel.set_markup("<b>Web</b>")     
+        midorilabel.set_markup("<b>Midori</b>")     
+
+        fixed.put(firefoxlabel, 48, 10)
+        fixed.put(chromelabel, 182, 10)
+        fixed.put(weblabel, 385, 10)
+        fixed.put(midorilabel, 545, 10)
+
+###################
+# Adding the logos#
+###################
+
+        imagefx = Gtk.Image()
+        imagefx.show()
+        imagefx.set_from_file("/usr/share/browser-manager/firefox/icon.png")
+
+        imagech = Gtk.Image()
+        imagech.show()
+        imagech.set_from_file("/usr/share/browser-manager/chrome/icon.png")
+
+        imagewe = Gtk.Image()
+        imagewe.show()
+        imagewe.set_from_file("/usr/share/browser-manager/web/icon.png")
+
+        imagemi = Gtk.Image()
+        imagemi.show()
+        imagemi.set_from_file("/usr/share/browser-manager/midori/icon.png")
+
+        aboutfirefox = Gtk.ToolButton()		
+        aboutfirefox.set_icon_widget(imagefx)	
+        aboutfirefox.connect("clicked", self.on_aboutfirefox)
+
+        fixed.put(aboutfirefox, 30, 35)
+
+        aboutfirefox.set_tooltip_text("About Firefox")
+
+        aboutchrome = Gtk.ToolButton()		
+        aboutchrome.set_icon_widget(imagech)	
+        aboutchrome.connect("clicked", self.on_aboutchrome)
+
+        fixed.put(aboutchrome, 195, 35)
+
+        aboutchrome.set_tooltip_text("About Google Chrome")
+
+        aboutweb = Gtk.ToolButton()		
+        aboutweb.set_icon_widget(imagewe)	
+        aboutweb.connect("clicked", self.on_aboutweb)
+
+        fixed.put(aboutweb, 360, 35)
+
+        aboutweb.set_tooltip_text("About Web")
+
+        aboutmidori = Gtk.ToolButton()		
+        aboutmidori.set_icon_widget(imagemi)	
+        aboutmidori.connect("clicked", self.on_aboutmidori)
+
+        fixed.put(aboutmidori, 525, 35)
+
+        aboutmidori.set_tooltip_text("About Midori")
+
+        self.add(fixed)
+        self.show_all()
+
+##############################        
+# Defining the button actions#
+##############################
+  
+    def on_destroy(self, widget):
+        Gtk.main_quit()
+
+    def on_instfirefox(self, widget):								 
+        try:
+            os.system("cd /usr/share/browser-manager/firefox && ./install")
+            Gtk.main_quit()
+        except:
+            mde = Gtk.MessageDialog(self, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "An error has occured")
+            mde.run()
+            mde.destroy()
+
+    def on_instchrome(self, widget): 
+        try:                               
+            os.system("cd /usr/share/browser-manager/chrome && ./install")
+            Gtk.main_quit()
+        except:
+            mde = Gtk.MessageDialog(self, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "An error has occured")
+            mde.run()
+            mde.destroy()
+    
+    def on_instweb(self, widget):									 
+        try:
+            os.system("cd /usr/share/browser-manager/web && ./install")
+            Gtk.main_quit()
+        except:
+            mde = Gtk.MessageDialog(self, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "An error has occured")
+            mde.run()
+            mde.destroy()
+
+    def on_instmidori(self, widget):								 
+        try:
+            os.system("cd /usr/share/browser-manager/midori && ./install")
+            Gtk.main_quit()
+        except:
+            mde = Gtk.MessageDialog(self, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "An error has occured")
+            mde.run()
+            mde.destroy()
+
+    def on_uninstfirefox(self, widget):								 
+        try:
+            os.system("cd /usr/share/browser-manager/firefox && ./uninstall")
+            Gtk.main_quit()
+        except:
+            mde = Gtk.MessageDialog(self, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "An error has occured")
+            mde.run()
+            mde.destroy()
+
+    def on_uninstchrome(self, widget):      							 
+        try:                               
+            os.system("cd /usr/share/browser-manager/chrome && ./uninstall")
+            Gtk.main_quit()
+        except:
+            mde = Gtk.MessageDialog(self, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "An error has occured")
+            mde.run()
+            mde.destroy()
+    
+    def on_uninstweb(self, widget):									 
+        try:
+            os.system("cd /usr/share/browser-manager/web && ./uninstall")
+            Gtk.main_quit()
+        except:
+            mde = Gtk.MessageDialog(self, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "An error has occured")
+            mde.run()
+            mde.destroy()
+
+    def on_uninstmidori(self, widget):								 
+        try:
+            os.system("cd /usr/share/browser-manager/midori && ./uninstall")
+            Gtk.main_quit()
+        except:
+            mde = Gtk.MessageDialog(self, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "An error has occured")
+            mde.run()
+            mde.destroy()
+
+    def on_aboutfirefox(self, widget):
+            mde = Gtk.MessageDialog(self, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Firefox delivers safe\nand easy web browsing\nwith a familiar user\ninterface, thousands of\nplugins, and integrated\nsearch that lets you get\nthe most out of the web.")
+            mde.run()
+            mde.destroy()
+
+    def on_aboutchrome(self, widget):
+            mde = Gtk.MessageDialog(self, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Google Chrome is an web\nbrowser project backed\nby Google that aims to\nbuild a safer, faster,\nand more stable way for\nall Internet users to\nexperience the web.")
+            mde.run()
+            mde.destroy()
+
+    def on_aboutweb(self, widget):
+            mde = Gtk.MessageDialog(self, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Web is the WebKit based\nweb browser for GNOME.\nIt offers a simple, clean,\nbeautiful view of the Web.\nIts principles are simplicity\nand standards compliance.")
+            mde.run()
+            mde.destroy()
+            pass
+
+    def on_aboutmidori(self, widget):
+            mde = Gtk.MessageDialog(self, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Midori is a super fast,\nlightweight web browser.\nIt uses upcoming\ntechnologies like Webkit\ncombined with sensible\ndesign to create a simple\nand fast web experience.")
+            mde.run()
+            mde.destroy()
+            pass
+
+    def on_close(self, widget):
+        Gtk.main_quit()
+
+BrowserManager()
+Gtk.main()

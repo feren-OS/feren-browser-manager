@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Zorin Web Browser Manager
+Comment=Easily install and uninstall web browsers in Zorin OS.
+GenericName=Browser Manager
+Exec=gksudo browser-manager
+Icon=browser-manager
+StartupNotify=false
+Terminal=false
+Type=Application
+Categories=Network;WebBrowser;
+

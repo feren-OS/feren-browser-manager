@@ -1,0 +1,74 @@
+#!/bin/bash
+
+###################################
+#Check if program is not installed#
+###################################
+dpkg -l chromium-browser |grep -q ^ii
+
+if [ ! $? -eq 0 ]; then
+         if [ ! -e "/usr/bin/chromium-browser" ]; then
+                  zenity --info --title="Information" --text="Chromium is not installed" --no-wrap &
+                  exit 0
+         fi
+fi
+
+################
+#Check for root#
+################
+if [ ! "$(whoami)" = "root" ]; then
+    zenity --question --title="Continue?" --text "Are you sure you want to remove Chromium?" --no-wrap
+
+    if [ ! $? -eq 0 ]; then
+            exit
+    fi
+    
+    pkexec "$0" $@
+    
+    if [ $? -eq 127 ]; then
+        exit 0
+    fi
+    
+    ######################
+    #Double Check Package#
+    ######################
+    dpkg -l chromium-browser |grep -q ^ii
+
+    if [ ! $? -eq 0 ]; then
+            if [ ! -e "chromium-browser" ]; then
+                    zenity --info --title="Uninstalled Chromium" --text="Chromium was successfully removed" --no-wrap &
+                    exit 0
+            fi
+            #######
+            #Error#
+            #######
+            zenity  --error --text="Feren OS couldn't remove Chromium successfully
+
+A log can be found at File System/tmp/chromium-removal-log" --title="Error" --no-wrap &
+            exit 0
+    fi
+fi
+
+###############################
+#Check if program is installed#
+###############################
+dpkg -l chromium-browser |grep -q ^ii
+
+if [ $? -eq 0 ]; then
+         if [ -e "/usr/bin/chromium-browser" ]; then
+
+###################
+#Uninstall program#
+###################
+        #Log output
+        exec 1>/tmp/chromium-removal-log 2>&1
+        
+                  apt-get -y remove chromium-browser
+         fi
+         exit
+fi
+
+#######
+#Error#
+#######
+zenity  --error --text="An error occured while initiating the Chromium removal process" --title="Error" --no-wrap &
+exit 0

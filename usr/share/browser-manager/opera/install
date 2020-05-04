@@ -1,0 +1,86 @@
+#!/bin/bash
+
+###############################
+#Check if program is installed#
+###############################
+dpkg -l opera-stable |grep -q ^ii
+
+if [ $? -eq 0 ]; then
+         if [ -e "/usr/bin/opera" ]; then
+                  zenity --info --title="Information" --text="Opera is already installed" --no-wrap &
+                  exit 0
+         fi
+fi
+
+
+
+################
+#Check for root#
+################
+if [ ! $(whoami) = "root" ]; then
+    zenity --question --title="Continue?" --text "The use of Opera is governed by the Terms found on https://www.opera.com/terms
+and the Privacy Statement found on https://www.opera.com/privacy, are you sure
+you want to install Opera?" --no-wrap
+
+    if [ ! $? -eq 0 ]; then
+           exit
+    fi
+
+    pkexec "$0"
+    
+    if [ $? -eq 127 ]; then
+        exit 0
+    fi
+    
+    ######################
+    #Double Check Package#
+    ######################
+    if [ -e "/usr/bin/opera" ]; then
+            zenity --info --title="Installation Complete" --text="Opera was successfully installed" --no-wrap &
+            exit 0
+    fi
+    #######
+    #Error#
+    #######
+    zenity  --error --text="Feren OS couldn't install Opera successfully
+
+A log can be found at File System/tmp/opera-install-log" --title="Error" --no-wrap &
+    exit 0
+fi
+
+###################################
+#Check if program is not installed#
+###################################
+dpkg -l opera-stable |grep -q ^ii
+
+if [ ! $? -eq 0 ]; then
+         if [ ! -e "/usr/bin/opera" ]; then
+
+#################
+#Install program#
+#################
+        #Log output
+        exec 1>/tmp/opera-install-log 2>&1
+
+		#Add PPA if it doesn't exist
+
+		if [ ! -f /etc/apt/sources.list.d/opera-stable.list ]; then
+			wget -qO- https://deb.opera.com/archive.key | apt-key add -
+            if [ ! $? -eq 0 ]; then
+                exit 1
+            fi
+			echo "deb https://deb.opera.com/opera-stable/ stable non-free" > /etc/apt/sources.list.d/opera-stable.list
+		fi
+                  sleep 1
+                  apt-get update
+                  echo "opera-stable opera-stable/add-deb-source boolean true" | debconf-set-selections
+                  apt-get install -y -q opera-stable
+         fi
+         exit
+fi
+
+#######
+#Error#
+#######
+zenity  --error --text="An error occured while initiating the Opera installation process" --title="Error" --no-wrap &
+exit 0

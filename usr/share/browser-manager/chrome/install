@@ -1,40 +1,66 @@
 #!/bin/bash
 
+###############################
+#Check if program is installed#
+###############################
+dpkg -l google-chrome-stable |grep -q ^ii
 
+if [ $? -eq 0 ]; then
+         if [ -e "/usr/bin/google-chrome" ]; then
+                  zenity --info --title="Information" --text="Google Chrome is already installed" --no-wrap &
+                  exit 0
+         fi
+fi
 
 ################
 #Check for root#
 ################
-if [ ! $USERNAME = "root" ]; then
-    gksudo --description="Web Browser Manager" /usr/share/browser-manager/chrome/install
+if [ ! $(whoami) = "root" ]; then
+    if [ ! -f /tmp/chrome-tos.txt ]; then
+        lynx --dump https://www.google.com/chrome/browser/privacy/eula_text.html | awk 'NR>1' > /tmp/chrome-tos.txt
+        chmod 755 /tmp/chrome-tos.txt
+    fi
+    echo "The use of Google Chrome is governed by these terms and conditions, are you sure you want to install Chrome?
+    $(cat /tmp/chrome-tos.txt)" > /tmp/chrome-tos.txt
+    if [ -f /tmp/chrome-tos.txt ]; then
+        zenity --text-info --filename=/tmp/chrome-tos.txt --title="Continue?" --text  --checkbox="I read and accept the terms. I would like to install Google Chrome." --cancel-label="No" --ok-label="Yes" --icon-name="dialog-question"
+    else
+        ##########
+        #Question#
+        ##########
+        zenity --question --title="Continue?" --text "Are you sure you want to install Google Chrome?" --no-wrap
+    fi
+
+    if [ ! $? -eq 0 ]; then
+        exit
+    fi
+
+    pkexec "$0"
+    
+    if [ $? -eq 127 ]; then
+        exit 0
+    fi    
+    
+    ######################
+    #Double Check Package#
+    ######################
+    if [ -e "/usr/bin/google-chrome" ]; then
+            zenity --info --title="Installation Complete" --text="Google Chrome was successfully installed" --no-wrap &
+            exit 0
+    fi
+    #######
+    #Error#
+    #######
+    zenity  --error --text="Feren OS couldn't install Google Chrome successfully
+
+A log can be found at File System/tmp/chrome-install-log" --title="Error" --no-wrap &
     exit 0
-fi
-
-##########
-#Question#
-##########
-zenity --question --title="Continue?" --text "Are you sure you want to continue?"
-
-if [ ! $? -eq 0 ]; then
-           exit
-fi
-
-###############################
-#Check if program is installed#
-###############################
-dpkg --get-selections | grep -P -q "google-chrome-stable\t*install"
-
-if [ $? -eq 0 ]; then
-         if [ -e "/usr/bin/google-chrome" ]; then
-                  zenity --info --title="Information" --text="Google Chrome is already installed!"
-                  exit 0
-         fi
 fi
 
 ###################################
 #Check if program is not installed#
 ###################################
-dpkg --get-selections | grep -P -q "google-chrome-stable\t*install"
+dpkg -l google-chrome-stable |grep -q ^ii
 
 if [ ! $? -eq 0 ]; then
          if [ ! -e "/usr/bin/google-chrome" ]; then
@@ -42,28 +68,24 @@ if [ ! $? -eq 0 ]; then
 #################
 #Install program#
 #################
-                  apt-get update | zenity --progress --title="Installing..." --text="Updating package archive..." --pulsate --auto-close && apt-get -y install google-chrome-stable | zenity --progress --title="Installing..." --text="Downloading and Installing..." --pulsate --auto-close
+        #Log output
+        exec 1>/tmp/chrome-install-log 2>&1
+        
+                if [ ! -f /etc/apt/sources.list.d/google-chrome.list ]; then
+                    wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add -
+                    if [ ! $? -eq 0 ]; then
+                        exit 1
+                    fi
+                    echo -e "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list
+                fi
+                apt-get update
+                apt-get -y install google-chrome-stable
          fi
-         ######################
-         #Double Check Package#
-         ######################
-         dpkg --get-selections | grep -P -q "google-chrome-stable\t*install"
-
-         if [ $? -eq 0 ]; then
-                  if [ -e "/usr/bin/google-chrome" ]; then
-                           zenity --info --title="Installation Complete" --text="Google Chrome installed successfully!"
-                           exit 0
-                  fi
-                  #######
-                  #Error#
-                  #######
-                  zenity  --error --text="An error occured." --title="Error"
-                  exit 0
-         fi
+         exit
 fi
 
 #######
 #Error#
 #######
-zenity  --error --text="An error occured." --title="Error"
+zenity  --error --text="An error occured while initiating the Google Chrome installation process" --title="Error" --no-wrap &
 exit 0

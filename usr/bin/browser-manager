@@ -1,301 +1,909 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
-# This file is part of Zorin Web Browser Manager.
+# This file is part of Feren OS Web Browser Manager.
 #
-# Zorin Web Browser Manager is free software: you can redistribute it and/or modify
+# Feren OS Web Browser Manager is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# Zorin Web Browser Manager is distributed in the hope that it will be useful,
+# Feren OS Web Browser Manager is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Zorin Web Browser Manager.  If not, see <http://www.gnu.org/licenses/>.
- 
+# along with Feren OS Web Browser Manager.  If not, see <http://www.gnu.org/licenses/>.
+
+#(c) Feren Team 2015-2020 <ferenosdev@outlook.com> 
 #(c) AZorin 2010-2015 <azorin@zoringroup.com>
 #(c) Zorink 2010 <zorink@zoringroup.com>
 #
-# Easily install and uninstall web browsers in Zorin OS.
+# Easily install and uninstall web browsers in Feren OS.
 # This is free software made available under the GNU public license.
 
-from gi.repository import Gtk
+from gi.repository import GLib, Gio
+from PyQt5 import QtGui, QtCore, QtWidgets
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QMessageBox, QLabel, QMainWindow, QProgressBar
+from PyQt5.QtCore import pyqtSlot, Qt
+from PyQt5.QtGui import QIcon, QPixmap
+import requests
 import os
 from os import path
+import sys
+from threading import Thread
+
+QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
+
+os.chdir('/tmp/')
 
 applogo = "/usr/share/pixmaps/browser-manager.svg"
 
-class BrowserManager(Gtk.Window):
+class BrowserManagerManager():    
+  def __init__(self, browsername, option, bmself):
+    try:
+        os.system("/usr/share/browser-manager/"+browsername+"/"+option)
+    except:
+        QMessageBox.critical(BrowserManager, "Web Browser Manager", "An error occured while initiating the package management process.")
+    BrowserManager.finish_process(bmself)
+
+class BrowserManager(QMainWindow):
+    
     def __init__(self):
-        super(BrowserManager, self).__init__()
+        super().__init__()
         
-        self.set_title("Zorin Web Browser Manager")
-        self.set_size_request(640, 220)
-        self.set_resizable(False)
-        self.set_icon_from_file(applogo)
-        self.set_position(Gtk.WindowPosition.CENTER)
-        self.connect("destroy", self.on_destroy)
-        
-        fixed = Gtk.Fixed()
+        self.title = "Web Browser Manager"
+        self.width = 815
+        self.height = 440
+        self.browserwork = False
+        self.initUI()
+    
+    def closeEvent(self, event):
+        if self.browserwork:
+            event.ignore()
+        else:
+            event.accept()
+
+    def initUI(self):
+        self.setWindowTitle(self.title)
+        self.setGeometry(10, 10, self.width, self.height)
+        self.setFixedSize(self.width, self.height)
 
 #####################
 # Adding the buttons#
 #####################
 
-        if os.path.isfile("/usr/bin/firefox"):
-            uninstfirefox = Gtk.Button("Uninstall")
-            uninstfirefox.connect("clicked", self.on_uninstfirefox)
-            uninstfirefox.set_size_request(87, 30)
-            
-            fixed.put(uninstfirefox, 30, 130)
+#        global uninstfirefox
+#        global uninstchrome
+#        global uninstopera
+#        global uninstweb
+#        global uninstvivaldi
+#        global uninstchromium
+#        global instfirefox
+#        global instchrome
+#        global instopera
+#        global instweb
+#        global instvivaldi
+#        global instchromium
+        global imgfx
+        global imgcr
+        global imgvi
+        global imgch
+        global imgop
+        global imgbr
+        global imgfa
+        global imagemse
+        global imagecz
 
-            uninstfirefox.set_tooltip_text("Uninstall Firefox")
+        is_64bits = sys.maxsize > 2**32
+    
+        #Vivaldi
+        self.uninstvivaldi = QPushButton("Uninstall", self)      
+        self.uninstvivaldi.clicked.connect(self.on_uninstvivaldi)
+        self.uninstvivaldi.setFixedSize(87, 30)
+ 
+        self.uninstvivaldi.move(30, 130)
+
+        self.uninstvivaldi.setToolTip("Uninstall Vivaldi")
+        self.instvivaldi = QPushButton("Install", self)          
+        self.instvivaldi.clicked.connect(self.on_instvivaldi)
+        self.instvivaldi.setFixedSize(87, 30)
+
+        self.instvivaldi.move(30, 130)
+
+        self.instvivaldi.setToolTip("Install Vivaldi")
+
+        #Google Chrome
+        self.uninstchrome = QPushButton("Uninstall", self)          
+        self.uninstchrome.clicked.connect(self.on_uninstchrome)
+        self.uninstchrome.setFixedSize(87, 30)
+
+        self.uninstchrome.move(195, 130)
+
+        self.uninstchrome.setToolTip("Uninstall Google Chrome")       
+        self.instchrome = QPushButton("Install", self)  
+        if is_64bits == False:
+            self.instchrome.setEnabled(False)   
+        self.instchrome.clicked.connect(self.on_instchrome)
+        self.instchrome.setFixedSize(87, 30)
+
+        self.instchrome.move(195, 130)
+
+        self.instchrome.setToolTip("Install Google Chrome")
+        if is_64bits == False:
+            self.instchrome.setToolTip("Not Available in 32 Bit Feren OS")
+    
+        #Chromium
+        self.uninstchromium = QPushButton("Uninstall", self)        
+        self.uninstchromium.clicked.connect(self.on_uninstchromium)
+        self.uninstchromium.setFixedSize(87, 30)
+ 
+        self.uninstchromium.move(360, 130)
+
+        self.uninstchromium.setToolTip("Uninstall Chromium")
+        self.instchromium = QPushButton("Install", self)            
+        self.instchromium.clicked.connect(self.on_instchromium)
+        self.instchromium.setFixedSize(87, 30)
+
+        self.instchromium.move(360, 130)
+
+        self.instchromium.setToolTip("Install Chromium")
+        
+        #Microsoft Edge
+        self.uninstmsedge = QPushButton("Uninstall", self)       
+        self.uninstmsedge.clicked.connect(self.on_uninstmsedge)
+        self.uninstmsedge.setFixedSize(87, 30)
+ 
+        self.uninstmsedge.move(525, 130)
+
+        self.uninstmsedge.setToolTip("Uninstall Microsoft Edge")
+        self.instmsedge = QPushButton("Install", self)
+        self.instmsedge.clicked.connect(self.on_instmsedge)
+        self.instmsedge.setFixedSize(87, 30)
+
+        self.instmsedge.move(525, 130)
+
+        #self.instmsedge.setToolTip("Install Microsoft Edge")
+        #is_64bits = sys.maxsize > 2**32
+        #if is_64bits == False:
+            #self.instbrave.setEnabled(False)
+            #self.instbrave.setToolTip("Not Available in 32 Bit Feren OS")
+        self.instmsedge.setEnabled(False)
+        self.instmsedge.setText("Coming Soon")
+        
+        #Mozilla Firefox
+        self.uninstfirefox = QPushButton("Uninstall", self)
+        self.uninstfirefox.clicked.connect(self.on_uninstfirefox)
+        self.uninstfirefox.setFixedSize(87, 30)
+        
+        self.uninstfirefox.move(690, 130)
+
+        self.uninstfirefox.setToolTip("Uninstall Firefox")
            
-        else:
-            instfirefox = Gtk.Button("Install")				
-            instfirefox.connect("clicked", self.on_instfirefox)
-            instfirefox.set_size_request(87, 30)
+        self.instfirefox = QPushButton("Install", self)             
+        self.instfirefox.clicked.connect(self.on_instfirefox)
+        self.instfirefox.setFixedSize(87, 30)
 
-            fixed.put(instfirefox, 30, 130)
+        self.instfirefox.move(690, 130)
  
-            instfirefox.set_tooltip_text("Install Firefox")
-
-        if os.path.isfile("/usr/bin/google-chrome"):
-            uninstchrome = Gtk.Button("Uninstall")			
-            uninstchrome.connect("clicked", self.on_uninstchrome)
-            uninstchrome.set_size_request(87, 30)
-
-            fixed.put(uninstchrome, 195, 130)
-
-            uninstchrome.set_tooltip_text("Uninstall Google Chrome")
-        else:        
-            chrome = Gtk.Button("Install")				
-            chrome.connect("clicked", self.on_instchrome)
-            chrome.set_size_request(87, 30)
-
-            fixed.put(chrome, 195, 130)
-
-            chrome.set_tooltip_text("Install Google Chrome")
-
-        if  os.path.isfile("/usr/bin/epiphany-browser"):
-            uninstweb = Gtk.Button("Uninstall")			
-            uninstweb.connect("clicked", self.on_uninstweb)
-            uninstweb.set_size_request(87, 30)
-
-            fixed.put(uninstweb, 360, 130)
-            
-            uninstweb.set_tooltip_text("Uninstall Web")
-        else:
-            web = Gtk.Button("Install")				
-            web.connect("clicked", self.on_instweb)
-            web.set_size_request(87, 30)
-
-            fixed.put(web, 360, 130)
-
-            web.set_tooltip_text("Install Web")
-     
-        if  os.path.isfile("/usr/bin/midori"):	
-            uninstmidori = Gtk.Button("Uninstall")		
-            uninstmidori.connect("clicked", self.on_uninstmidori)
-            uninstmidori.set_size_request(87, 30)
+        self.instfirefox.setToolTip("Install Firefox")
+        
+        #Brave
+        self.uninstbrave = QPushButton("Uninstall", self)       
+        self.uninstbrave.clicked.connect(self.on_uninstbrave)
+        self.uninstbrave.setFixedSize(87, 30)
  
-            fixed.put(uninstmidori, 525, 130)
+        self.uninstbrave.move(30, 315)
 
-            uninstmidori.set_tooltip_text("Uninstall Midori")
-        else:
-            instmidori = Gtk.Button("Install")			
-            instmidori.connect("clicked", self.on_instmidori)
-            instmidori.set_size_request(87, 30)
+        self.uninstbrave.setToolTip("Uninstall Brave")
+        self.instbrave = QPushButton("Install", self)
+        self.instbrave.clicked.connect(self.on_instbrave)
+        self.instbrave.setFixedSize(87, 30)
 
-            fixed.put(instmidori, 525, 130)
+        self.instbrave.move(30, 315)
 
-            instmidori.set_tooltip_text("Install Midori")
+        self.instbrave.setToolTip("Install Brave")
+        if is_64bits == False:
+            self.instbrave.setEnabled(False)
+            self.instbrave.setToolTip("Not Available in 32 Bit Feren OS")
 
-        close = Gtk.Button(stock=Gtk.STOCK_CLOSE)		
-        close.connect("clicked", self.on_close)
-        close.set_size_request(85, 30)
+        #Opera
+        self.uninstopera = QPushButton("Uninstall", self)       
+        self.uninstopera.clicked.connect(self.on_uninstopera)
+        self.uninstopera.setFixedSize(87, 30)
+ 
+        self.uninstopera.move(195, 315)
 
-        fixed.put(close, 545, 180)
+        self.uninstopera.setToolTip("Uninstall Opera")
+        self.instopera = QPushButton("Install", self)           
+        self.instopera.clicked.connect(self.on_instopera)
+        self.instopera.setFixedSize(87, 30)
+
+        self.instopera.move(195, 315)
+
+        self.instopera.setToolTip("Install Opera")
+
+        if is_64bits == False:
+            self.instopera.setEnabled(False)
+            self.instopera.setToolTip("Not Available in 32 Bit Feren OS")
+        
+        #Cliqz
+        self.uninstcliqz = QPushButton("Uninstall", self)       
+        self.uninstcliqz.clicked.connect(self.on_uninstcliqz)
+        self.uninstcliqz.setFixedSize(87, 30)
+ 
+        self.uninstcliqz.move(360, 315)
+
+        self.uninstcliqz.setToolTip("Uninstall Cliqz")
+        self.instcliqz = QPushButton("Install", self)
+        self.instcliqz.clicked.connect(self.on_instcliqz)
+        self.instcliqz.setFixedSize(87, 30)
+
+        self.instcliqz.move(360, 315)
+
+        self.instcliqz.setToolTip("Install Cliqz")
+        if is_64bits == False:
+            self.instcliqz.setEnabled(False)
+            self.instcliqz.setToolTip("Not Available in 32 Bit Feren OS")
+
+        #Falkon
+        self.uninstfalkon = QPushButton("Uninstall", self)      
+        self.uninstfalkon.clicked.connect(self.on_uninstfalkon)
+        self.uninstfalkon.setFixedSize(87, 30)
+ 
+        self.uninstfalkon.move(525, 315)
+
+        self.uninstfalkon.setToolTip("Uninstall Falkon")
+        self.instfalkon = QPushButton("Install", self)
+        self.instfalkon.clicked.connect(self.on_instfalkon)
+        self.instfalkon.setFixedSize(87, 30)
+
+        self.instfalkon.move(525, 315)
+
+        self.instfalkon.setToolTip("Install Falkon")    
+
+        #GNOME Web
+        self.uninstweb = QPushButton("Uninstall", self)         
+        self.uninstweb.clicked.connect(self.on_uninstweb)
+        self.uninstweb.setFixedSize(87, 30)
+
+        self.uninstweb.move(690, 315)
+        
+        self.uninstweb.setToolTip("Uninstall Epiphany")
+        self.instweb = QPushButton("Install", self)             
+        self.instweb.clicked.connect(self.on_instweb)
+        self.instweb.setFixedSize(87, 30)
+
+        self.instweb.move(690, 315)
+
+        self.instweb.setToolTip("Install Epiphany")
+
+        self.closebtn = QPushButton("Close", self)  
+        self.closebtn.clicked.connect(self.on_close)
+        self.closebtn.setFixedSize(85, 30)
+
+        self.closebtn.move(720, 400)
+
+        self.aboutbtn = QPushButton("About", self)  
+        self.aboutbtn.clicked.connect(self.on_aboutbm)
+        self.aboutbtn.setFixedSize(85, 30)
+
+        self.aboutbtn.move(10, 400)
+        
+        self.progressbar1 = QProgressBar(self)
+        self.progressbar1.setRange(0,1)
+        self.progressbar1.setFixedSize(85, 28)
+        self.progressbar1.move(10, 405)
+        self.progressbar1.setMinimum(0)
+        self.progressbar1.setMaximum(0)
+        self.progressbar1.setValue(0)
+        self.progressbar1.setVisible(False)
         
 ############################
 # Adding the program titles#
 ############################
        
-        firefoxlabel = Gtk.Label()
-        chromelabel = Gtk.Label()
-        weblabel = Gtk.Label()
-        midorilabel = Gtk.Label()   
+        firefoxlabel = QLabel("", self)
+        chromelabel = QLabel("", self)
+        weblabel = QLabel("", self)
+        vivaldilabel = QLabel("", self)   
+        chromiumlabel = QLabel("", self) 
+        operalabel = QLabel("", self) 
+        bravelabel = QLabel("", self) 
+        msedgelabel = QLabel("", self)
+        cliqzlabel = QLabel("", self)
+        falkonlabel = QLabel("", self)
+        
+        boldFont=QtGui.QFont()
+        boldFont.setBold(True)
 
-        firefoxlabel.set_markup("<b>Firefox</b>")     
-        chromelabel.set_markup("<b>Google Chrome</b>")     
-        weblabel.set_markup("<b>Web</b>")     
-        midorilabel.set_markup("<b>Midori</b>")     
+        firefoxlabel.setText("Mozilla Firefox")
+        firefoxlabel.setFont(boldFont)
+        chromelabel.setText("Google Chrome")
+        chromelabel.setFont(boldFont)
+        weblabel.setText("GNOME Web")
+        weblabel.setFont(boldFont)
+        vivaldilabel.setText("Vivaldi")
+        vivaldilabel.setFont(boldFont)
+        chromiumlabel.setText("Chromium")
+        chromiumlabel.setFont(boldFont)
+        operalabel.setText("Opera")
+        operalabel.setFont(boldFont)
+        bravelabel.setText("Brave")
+        bravelabel.setFont(boldFont)
+        msedgelabel.setText("Microsoft Edge")
+        msedgelabel.setFont(boldFont)
+        cliqzlabel.setText("Cliqz")
+        cliqzlabel.setFont(boldFont)
+        falkonlabel.setText("Falkon")
+        falkonlabel.setFont(boldFont)
+        
+        labelwidth = vivaldilabel.fontMetrics().boundingRect(vivaldilabel.text()).width()
+        vivaldilabel.move((35 + 37.5 - (0.5 * labelwidth)), 10)
+        vivaldilabel.setFixedWidth(labelwidth)
+        vivaldilabel.setAlignment(Qt.AlignCenter)
+        
+        labelwidth = chromelabel.fontMetrics().boundingRect(chromelabel.text()).width()
+        chromelabel.move((200 + 37.5 - (0.5 * labelwidth)), 10)
+        chromelabel.setFixedWidth(labelwidth)
+        chromelabel.setAlignment(Qt.AlignCenter)
+        
+        labelwidth = chromiumlabel.fontMetrics().boundingRect(chromiumlabel.text()).width()
+        chromiumlabel.move((365 + 37.5 - (0.5 * labelwidth)), 10)
+        chromiumlabel.setFixedWidth(labelwidth)
+        chromiumlabel.setAlignment(Qt.AlignCenter)
+        
+        labelwidth = msedgelabel.fontMetrics().boundingRect(msedgelabel.text()).width()
+        msedgelabel.move((530 + 37.5 - (0.5 * labelwidth)), 10)
+        msedgelabel.setFixedWidth(labelwidth)
+        msedgelabel.setAlignment(Qt.AlignCenter)
 
-        fixed.put(firefoxlabel, 48, 10)
-        fixed.put(chromelabel, 182, 10)
-        fixed.put(weblabel, 385, 10)
-        fixed.put(midorilabel, 545, 10)
+        labelwidth = firefoxlabel.fontMetrics().boundingRect(firefoxlabel.text()).width()
+        firefoxlabel.move((695 + 37.5 - (0.5 * labelwidth)), 10)
+        firefoxlabel.setFixedWidth(labelwidth)
+        firefoxlabel.setAlignment(Qt.AlignCenter)
+        
+        labelwidth = bravelabel.fontMetrics().boundingRect(bravelabel.text()).width()
+        bravelabel.move((35 + 37.5 - (0.5 * labelwidth)), 190)
+        bravelabel.setFixedWidth(labelwidth)
+        bravelabel.setAlignment(Qt.AlignCenter)
+        
+        labelwidth = operalabel.fontMetrics().boundingRect(operalabel.text()).width()
+        operalabel.move((200 + 37.5 - (0.5 * labelwidth)), 190)
+        operalabel.setFixedWidth(labelwidth)
+        operalabel.setAlignment(Qt.AlignCenter)
+        
+        labelwidth = cliqzlabel.fontMetrics().boundingRect(cliqzlabel.text()).width()
+        cliqzlabel.move((365 + 37.5 - (0.5 * labelwidth)), 190)
+        cliqzlabel.setFixedWidth(labelwidth)
+        cliqzlabel.setAlignment(Qt.AlignCenter)
+        
+        labelwidth = falkonlabel.fontMetrics().boundingRect(falkonlabel.text()).width()
+        falkonlabel.move((530 + 37.5 - (0.5 * labelwidth)), 190)
+        falkonlabel.setFixedWidth(labelwidth)
+        falkonlabel.setAlignment(Qt.AlignCenter)
+        
+        labelwidth = weblabel.fontMetrics().boundingRect(weblabel.text()).width()
+        weblabel.move((695 + 37.5 - (0.5 * labelwidth)), 190)
+        weblabel.setFixedWidth(labelwidth)
+        weblabel.setAlignment(Qt.AlignCenter)
 
 ###################
 # Adding the logos#
 ###################
 
-        imagefx = Gtk.Image()
-        imagefx.show()
-        imagefx.set_from_file("/usr/share/browser-manager/firefox/icon.png")
+        
+        if os.path.exists('/tmp/firefox-logo.png'):
+            imgfx = '/tmp/firefox-logo.png'
+        else:
+            imgfx = '/usr/share/icons/Inspire/96/apps/internet-web-browser.png'
 
-        imagech = Gtk.Image()
-        imagech.show()
-        imagech.set_from_file("/usr/share/browser-manager/chrome/icon.png")
+        if os.path.exists('/tmp/google-chrome-logo.png'):
+            imgcr = '/tmp/google-chrome-logo.png'
+        else:
+            imgcr = '/usr/share/icons/Inspire/96/apps/internet-web-browser.png'
 
-        imagewe = Gtk.Image()
-        imagewe.show()
-        imagewe.set_from_file("/usr/share/browser-manager/web/icon.png")
+        imgwe = "/usr/share/browser-manager/web/icon.png"
 
-        imagemi = Gtk.Image()
-        imagemi.show()
-        imagemi.set_from_file("/usr/share/browser-manager/midori/icon.png")
+        if os.path.exists('/tmp/vivaldi-logo.png'):
+            imgvi = '/tmp/vivaldi-logo.png'
+        else:
+            imgvi = '/usr/share/icons/Inspire/96/apps/internet-web-browser.png'
 
-        aboutfirefox = Gtk.ToolButton()		
-        aboutfirefox.set_icon_widget(imagefx)	
-        aboutfirefox.connect("clicked", self.on_aboutfirefox)
+        if os.path.exists('/tmp/chromium-logo.png'):
+            imgch = '/tmp/chromium-logo.png'
+        else:
+            imgch = '/usr/share/icons/Inspire/96/apps/internet-web-browser.png'
 
-        fixed.put(aboutfirefox, 30, 35)
+        if os.path.exists('/tmp/opera-logo.png'):
+            imgop = '/tmp/opera-logo.png'
+        else:
+            imgop = '/usr/share/icons/Inspire/96/apps/internet-web-browser.png'
 
-        aboutfirefox.set_tooltip_text("About Firefox")
+        if os.path.exists('/tmp/brave-logo.png'):
+            imgbr = '/tmp/brave-logo.png'
+        else:
+            imgbr = '/usr/share/icons/Inspire/96/apps/internet-web-browser.png'
 
-        aboutchrome = Gtk.ToolButton()		
-        aboutchrome.set_icon_widget(imagech)	
-        aboutchrome.connect("clicked", self.on_aboutchrome)
+        if os.path.exists('/tmp/falkon-logo.png'):
+            imgfa = '/tmp/falkon-logo.png'
+        else:
+            imgfa = '/usr/share/icons/Inspire/96/apps/internet-web-browser.png'
 
-        fixed.put(aboutchrome, 195, 35)
+        if os.path.exists('/tmp/cliqz-logo.png'):
+            imgcz = '/tmp/cliqz-logo.png'
+        else:
+            imgcz = '/usr/share/icons/Inspire/96/apps/internet-web-browser.png'
 
-        aboutchrome.set_tooltip_text("About Google Chrome")
+        if os.path.exists('/tmp/microsoft-edge-logo.png'):
+            imgmse = '/tmp/microsoft-edge-logo.png'
+        else:
+            imgmse = '/usr/share/icons/Inspire/96/apps/internet-web-browser.png'
 
-        aboutweb = Gtk.ToolButton()		
-        aboutweb.set_icon_widget(imagewe)	
-        aboutweb.connect("clicked", self.on_aboutweb)
+        self.aboutvivaldi = QPushButton('', self)
+        self.aboutvivaldi.setIcon(QtGui.QIcon(imgvi))
+        self.aboutvivaldi.setIconSize(QtCore.QSize(65,65))
+        self.aboutvivaldi.clicked.connect(self.on_aboutvivaldi)
+        self.aboutvivaldi.setFixedSize(75, 75)
 
-        fixed.put(aboutweb, 360, 35)
+        self.aboutvivaldi.move(35, 35)
 
-        aboutweb.set_tooltip_text("About Web")
+        self.aboutvivaldi.setToolTip("About Vivaldi")
 
-        aboutmidori = Gtk.ToolButton()		
-        aboutmidori.set_icon_widget(imagemi)	
-        aboutmidori.connect("clicked", self.on_aboutmidori)
+        self.aboutchrome = QPushButton('', self)
+        self.aboutchrome.setIcon(QtGui.QIcon(imgcr))
+        self.aboutchrome.setIconSize(QtCore.QSize(65,65))
+        self.aboutchrome.clicked.connect(self.on_aboutchrome)
+        self.aboutchrome.setFixedSize(75, 75)
 
-        fixed.put(aboutmidori, 525, 35)
+        self.aboutchrome.move(200, 35)
 
-        aboutmidori.set_tooltip_text("About Midori")
+        self.aboutchrome.setToolTip("About Google Chrome")
 
-        self.add(fixed)
-        self.show_all()
+        self.aboutchromium = QPushButton('', self)
+        self.aboutchromium.setIcon(QtGui.QIcon(imgch))
+        self.aboutchromium.setIconSize(QtCore.QSize(65,65))
+        self.aboutchromium.clicked.connect(self.on_aboutchromium)
+        self.aboutchromium.setFixedSize(75, 75)
+
+        self.aboutchromium.move(365, 35)
+
+        self.aboutchromium.setToolTip("About Chromium")
+
+        self.aboutmsedge = QPushButton('', self)
+        self.aboutmsedge.setIcon(QtGui.QIcon(imgmse))
+        self.aboutmsedge.setIconSize(QtCore.QSize(65,65))
+        self.aboutmsedge.clicked.connect(self.on_aboutmsedge)
+        self.aboutmsedge.setFixedSize(75, 75)
+
+        self.aboutmsedge.move(530, 35)
+
+        self.aboutmsedge.setToolTip("About Microsoft Edge")
+
+        self.aboutfirefox = QPushButton('', self)
+        self.aboutfirefox.clicked.connect(self.on_aboutfirefox)
+        self.aboutfirefox.setIcon(QtGui.QIcon(imgfx))
+        self.aboutfirefox.setIconSize(QtCore.QSize(65, 65))
+        self.aboutfirefox.setFixedSize(75, 75)
+
+        self.aboutfirefox.move(695, 35)
+
+        self.aboutfirefox.setToolTip("About Firefox")
+
+        self.aboutbrave = QPushButton('', self)
+        self.aboutbrave.setIcon(QtGui.QIcon(imgbr))
+        self.aboutbrave.setIconSize(QtCore.QSize(65,65))
+        self.aboutbrave.clicked.connect(self.on_aboutbrave)
+        self.aboutbrave.setFixedSize(75, 75)
+
+        self.aboutbrave.move(35, 220)
+
+        self.aboutbrave.setToolTip("About Brave")
+
+        self.aboutopera = QPushButton('', self)
+        self.aboutopera.setIcon(QtGui.QIcon(imgop))
+        self.aboutopera.setIconSize(QtCore.QSize(65,65))
+        self.aboutopera.clicked.connect(self.on_aboutopera)
+        self.aboutopera.setFixedSize(75, 75)
+
+        self.aboutopera.move(200, 220)
+
+        self.aboutopera.setToolTip("About Opera")
+
+        self.aboutcliqz = QPushButton('', self)
+        self.aboutcliqz.setIcon(QtGui.QIcon(imgcz))
+        self.aboutcliqz.setIconSize(QtCore.QSize(65,65))
+        self.aboutcliqz.clicked.connect(self.on_aboutcliqz)
+        self.aboutcliqz.setFixedSize(75, 75)
+
+        self.aboutcliqz.move(365, 220)
+
+        self.aboutcliqz.setToolTip("About Cliqz")
+
+        self.aboutfalkon = QPushButton('', self)
+        self.aboutfalkon.setIcon(QtGui.QIcon(imgfa))
+        self.aboutfalkon.setIconSize(QtCore.QSize(65,65))
+        self.aboutfalkon.clicked.connect(self.on_aboutfalkon)
+        self.aboutfalkon.setFixedSize(75, 75)
+
+        self.aboutfalkon.move(530, 220)
+
+        self.aboutfalkon.setToolTip("About Falkon")
+        
+        self.aboutweb = QPushButton('', self)
+        self.aboutweb.setIcon(QtGui.QIcon(imgwe))
+        self.aboutweb.setIconSize(QtCore.QSize(65,65))
+        self.aboutweb.clicked.connect(self.on_aboutweb)
+        self.aboutweb.setFixedSize(75, 75)
+
+        self.aboutweb.move(695, 220)
+
+        self.aboutweb.setToolTip("About Web")
+
+        self.on_refresh()
+        self.show()
 
 ##############################        
 # Defining the button actions#
 ##############################
-  
-    def on_destroy(self, widget):
-        Gtk.main_quit()
 
-    def on_instfirefox(self, widget):								 
-        try:
-            os.system("cd /usr/share/browser-manager/firefox && ./install")
-            Gtk.main_quit()
-        except:
-            mde = Gtk.MessageDialog(self, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "An error has occured")
-            mde.run()
-            mde.destroy()
+    def finish_process(self):
+        self.instfirefox.setEnabled(True)
+        self.instchrome.setEnabled(True)
+        self.instweb.setEnabled(True)
+        self.instvivaldi.setEnabled(True)
+        self.instchromium.setEnabled(True)
+        self.instopera.setEnabled(True)
+        self.instbrave.setEnabled(True)
+        self.instfalkon.setEnabled(True)
+        self.instmsedge.setEnabled(True)
+        self.instcliqz.setEnabled(True)
+        self.uninstfirefox.setEnabled(True)
+        self.uninstchrome.setEnabled(True)
+        self.uninstweb.setEnabled(True)
+        self.uninstvivaldi.setEnabled(True)
+        self.uninstchromium.setEnabled(True)
+        self.uninstopera.setEnabled(True)
+        self.uninstbrave.setEnabled(True)
+        self.uninstfalkon.setEnabled(True)
+        self.uninstmsedge.setEnabled(True)
+        self.uninstcliqz.setEnabled(True)
+        self.closebtn.setEnabled(True)
+        self.browserwork = False
+        self.on_refresh()
+        self.progressbar1.setVisible(False)
+        self.progressbar1.move(10, 405)
+        is_64bits = sys.maxsize > 2**32
+        if is_64bits == False:
+            self.instbrave.setEnabled(False)
+            self.instopera.setEnabled(False)
+            self.instchrome.setEnabled(False)
+            self.instcliqz.setEnabled(False)
+        
+    def begin_process(self):
+        self.instfirefox.setEnabled(False)
+        self.instchrome.setEnabled(False)
+        self.instweb.setEnabled(False)
+        self.instvivaldi.setEnabled(False)
+        self.instchromium.setEnabled(False)
+        self.instopera.setEnabled(False)
+        self.instbrave.setEnabled(False)
+        self.instfalkon.setEnabled(False)
+        self.instmsedge.setEnabled(False)
+        self.instcliqz.setEnabled(False)
+        self.uninstfirefox.setEnabled(False)
+        self.uninstchrome.setEnabled(False)
+        self.uninstweb.setEnabled(False)
+        self.uninstvivaldi.setEnabled(False)
+        self.uninstchromium.setEnabled(False)
+        self.uninstopera.setEnabled(False)
+        self.uninstbrave.setEnabled(False)
+        self.uninstfalkon.setEnabled(False)
+        self.uninstmsedge.setEnabled(False)
+        self.uninstcliqz.setEnabled(False)
+        self.closebtn.setEnabled(False)
+        self.browserwork = True
+        self.progressbar1.setVisible(True)
+  
+    def on_refresh(self):
+        if os.path.isfile("/usr/bin/firefox"):
+            self.instfirefox.setVisible(False)
+            self.uninstfirefox.setVisible(True)
+        else:
+            self.uninstfirefox.setVisible(False)
+            self.instfirefox.setVisible(True)
+
+        if os.path.isfile("/usr/bin/google-chrome"):
+            self.instchrome.setVisible(False)
+            self.uninstchrome.setVisible(True)
+        else:
+            self.uninstchrome.setVisible(False)
+            self.instchrome.setVisible(True)
+
+        if os.path.isfile("/usr/bin/epiphany-browser"):
+            self.instweb.setVisible(False)
+            self.uninstweb.setVisible(True)
+        else:
+            self.uninstweb.setVisible(False)
+            self.instweb.setVisible(True)
+
+        if os.path.isfile("/usr/bin/vivaldi"):
+            self.instvivaldi.setVisible(False)
+            self.uninstvivaldi.setVisible(True)
+        else:
+            self.uninstvivaldi.setVisible(False)
+            self.instvivaldi.setVisible(True)
+
+        if os.path.isfile("/usr/bin/chromium-browser"):
+            self.instchromium.setVisible(False)
+            self.uninstchromium.setVisible(True)
+        else:
+            self.uninstchromium.setVisible(False)
+            self.instchromium.setVisible(True)
+
+        if os.path.isfile("/usr/bin/opera"):
+            self.instopera.setVisible(False)
+            self.uninstopera.setVisible(True)
+        else:
+            self.uninstopera.setVisible(False)
+            self.instopera.setVisible(True)
+
+        if os.path.isfile("/usr/bin/brave-browser"):
+            self.instbrave.setVisible(False)
+            self.uninstbrave.setVisible(True)
+        else:
+            self.uninstbrave.setVisible(False)
+            self.instbrave.setVisible(True)
+    
+        if os.path.isfile("/usr/bin/falkon"):
+            self.instfalkon.setVisible(False)
+            self.uninstfalkon.setVisible(True)
+        else:
+            self.uninstfalkon.setVisible(False)
+            self.instfalkon.setVisible(True)
+    
+        #if os.path.isfile("/usr/bin/microsoft-edge"):
+            #self.instmsedge.setVisible(False)
+            #self.uninstmsedge.setVisible(True)
+        #else:
+            #self.uninstmsedge.setVisible(False)
+            #self.instmsedge.setVisible(True)
+        self.uninstmsedge.setVisible(False)
+        self.instmsedge.setVisible(True)
+        self.instmsedge.setEnabled(False)
+    
+        if os.path.isfile("/usr/local/bin/cliqz"):
+            self.instcliqz.setVisible(False)
+            self.uninstcliqz.setVisible(True)
+        else:
+            self.uninstcliqz.setVisible(False)
+            self.instcliqz.setVisible(True)
+
+    def on_instvivaldi(self, widget):                                 
+        self.begin_process()
+        self.progressbar1.move(31, 131)
+        t = Thread(
+            target=BrowserManagerManager,
+            args=("vivaldi", "install", self)
+        )
+        t.start()
 
     def on_instchrome(self, widget): 
-        try:                               
-            os.system("cd /usr/share/browser-manager/chrome && ./install")
-            Gtk.main_quit()
-        except:
-            mde = Gtk.MessageDialog(self, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "An error has occured")
-            mde.run()
-            mde.destroy()
+        self.begin_process()
+        self.progressbar1.move(196, 131)
+        t = Thread(
+            target=BrowserManagerManager,
+            args=("chrome", "install", self)
+        )
+        t.start()
+
+    def on_instchromium(self, widget):                               
+        self.begin_process()
+        self.progressbar1.move(361, 131)
+        t = Thread(
+            target=BrowserManagerManager,
+            args=("chromium", "install", self)
+        )
+        t.start()
+
+    def on_instmsedge(self, widget):                                 
+        self.begin_process()
+        self.progressbar1.move(526, 131)
+        t = Thread(
+            target=BrowserManagerManager,
+            args=("msedge", "install", self)
+        )
+        t.start()
+
+    def on_instfirefox(self, widget):
+        self.begin_process()
+        self.progressbar1.move(691, 131)
+        t = Thread(
+            target=BrowserManagerManager,
+            args=("firefox", "install", self)
+        )
+        t.start()
+
+    def on_instbrave(self, widget):                              
+        self.begin_process()
+        self.progressbar1.move(31, 316)
+        t = Thread(
+            target=BrowserManagerManager,
+            args=("brave", "install", self)
+        )
+        t.start()
+
+    def on_instopera(self, widget): 
+        self.begin_process()
+        self.progressbar1.move(196, 316)
+        t = Thread(
+            target=BrowserManagerManager,
+            args=("opera", "install", self)
+        )
+        t.start()
+
+    def on_instcliqz(self, widget):                                 
+        self.begin_process()
+        self.progressbar1.move(361, 316)
+        t = Thread(
+            target=BrowserManagerManager,
+            args=("cliqz", "install", self)
+        )
+        t.start()
+
+    def on_instfalkon(self, widget):                                 
+        self.begin_process()
+        self.progressbar1.move(526, 316)
+        t = Thread(
+            target=BrowserManagerManager,
+            args=("falkon", "install", self)
+        )
+        t.start()
     
-    def on_instweb(self, widget):									 
-        try:
-            os.system("cd /usr/share/browser-manager/web && ./install")
-            Gtk.main_quit()
-        except:
-            mde = Gtk.MessageDialog(self, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "An error has occured")
-            mde.run()
-            mde.destroy()
+    def on_instweb(self, widget):                                    
+        self.begin_process()
+        self.progressbar1.move(691, 316)
+        t = Thread(
+            target=BrowserManagerManager,
+            args=("web", "install", self)
+        )
+        t.start()
 
-    def on_instmidori(self, widget):								 
-        try:
-            os.system("cd /usr/share/browser-manager/midori && ./install")
-            Gtk.main_quit()
-        except:
-            mde = Gtk.MessageDialog(self, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "An error has occured")
-            mde.run()
-            mde.destroy()
+    def on_uninstvivaldi(self, widget):                               
+        self.begin_process()
+        self.progressbar1.move(31, 131)
+        t = Thread(
+            target=BrowserManagerManager,
+            args=("vivaldi", "uninstall", self)
+        )
+        t.start()
 
-    def on_uninstfirefox(self, widget):								 
-        try:
-            os.system("cd /usr/share/browser-manager/firefox && ./uninstall")
-            Gtk.main_quit()
-        except:
-            mde = Gtk.MessageDialog(self, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "An error has occured")
-            mde.run()
-            mde.destroy()
-
-    def on_uninstchrome(self, widget):      							 
-        try:                               
-            os.system("cd /usr/share/browser-manager/chrome && ./uninstall")
-            Gtk.main_quit()
-        except:
-            mde = Gtk.MessageDialog(self, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "An error has occured")
-            mde.run()
-            mde.destroy()
+    def on_uninstchrome(self, widget):                                   
+        self.begin_process()
+        self.progressbar1.move(196, 131)
+        t = Thread(
+            target=BrowserManagerManager,
+            args=("chrome", "uninstall", self)
+        )
+        t.start()
     
-    def on_uninstweb(self, widget):									 
-        try:
-            os.system("cd /usr/share/browser-manager/web && ./uninstall")
-            Gtk.main_quit()
-        except:
-            mde = Gtk.MessageDialog(self, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "An error has occured")
-            mde.run()
-            mde.destroy()
+    def on_uninstchromium(self, widget):                                 
+        self.begin_process()
+        self.progressbar1.move(361, 131)
+        t = Thread(
+            target=BrowserManagerManager,
+            args=("chromium", "uninstall", self)
+        )
+        t.start()
 
-    def on_uninstmidori(self, widget):								 
-        try:
-            os.system("cd /usr/share/browser-manager/midori && ./uninstall")
-            Gtk.main_quit()
-        except:
-            mde = Gtk.MessageDialog(self, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "An error has occured")
-            mde.run()
-            mde.destroy()
+    def on_uninstmsedge(self, widget):                               
+        self.begin_process()
+        self.progressbar1.move(526, 131)
+        t = Thread(
+            target=BrowserManagerManager,
+            args=("msedge", "uninstall", self)
+        )
+        t.start()
 
-    def on_aboutfirefox(self, widget):
-            mde = Gtk.MessageDialog(self, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Firefox delivers safe\nand easy web browsing\nwith a familiar user\ninterface, thousands of\nplugins, and integrated\nsearch that lets you get\nthe most out of the web.")
-            mde.run()
-            mde.destroy()
+    def on_uninstfirefox(self, widget):                              
+        self.begin_process()
+        self.progressbar1.move(691, 131)
+        t = Thread(
+            target=BrowserManagerManager,
+            args=("firefox", "uninstall", self)
+        )
+        t.start()
+
+    def on_uninstbrave(self, widget):                                
+        self.begin_process()
+        self.progressbar1.move(31, 316)
+        t = Thread(
+            target=BrowserManagerManager,
+            args=("brave", "uninstall", self)
+        )
+        t.start()
+
+    def on_uninstopera(self, widget):                                
+        self.begin_process()
+        self.progressbar1.move(196, 316)
+        t = Thread(
+            target=BrowserManagerManager,
+            args=("opera", "uninstall", self)
+        )
+        t.start()
+
+    def on_uninstcliqz(self, widget):                               
+        self.begin_process()
+        self.progressbar1.move(361, 316)
+        t = Thread(
+            target=BrowserManagerManager,
+            args=("cliqz", "uninstall", self)
+        )
+        t.start()
+
+    def on_uninstfalkon(self, widget):                               
+        self.begin_process()
+        self.progressbar1.move(526, 316)
+        t = Thread(
+            target=BrowserManagerManager,
+            args=("falkon", "uninstall", self)
+        )
+        t.start()
+    
+    def on_uninstweb(self, widget):                                  
+        self.begin_process()
+        self.progressbar1.move(691, 316)
+        t = Thread(
+            target=BrowserManagerManager,
+            args=("web", "uninstall", self)
+        )
+        t.start()
+
+    def on_aboutvivaldi(self, widget):
+            QMessageBox.information(self, " ", "Vivaldi is the defacto web browser in Feren OS, being developed by Vivaldi Technologies - a company founded by former Opera Software cofounder and CEO Jon Stephenson von Tetzchner. It is a browser that is simple by default but powerful when needed, with easily accessible features to greatly improve your browser workflow right out of the box. It also provides an optional advertisement and tracking blocker.\n\nBased on: Chromium\nMobile Version available: Yes\nExtra Repositories Added: Vivaldi's Official Package Repository")
+            pass
 
     def on_aboutchrome(self, widget):
-            mde = Gtk.MessageDialog(self, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Google Chrome is an web\nbrowser project backed\nby Google that aims to\nbuild a safer, faster,\nand more stable way for\nall Internet users to\nexperience the web.")
-            mde.run()
-            mde.destroy()
+            QMessageBox.information(self, " ", "Google Chrome is an web browser project backed by Google that aims to build a safer, faster, and more stable way for all internet users to experience the web.\n\nBased on: Chromium\nMobile Version available: Yes\nExtra Repositories Added: Google Chrome's (Stable) Package Repository")
+
+    def on_aboutchromium(self, widget):
+            QMessageBox.information(self, " ", "Chromium is the open source father of Google Chrome, also being mainly made by Google. It shares a lot of the GUI that Google Chrome has, but with an alternative logo and some other features missing such as codecs being pre-installed, and so on.\n\nBased on: N/A\nMobile Version available: Yes\nExtra Repositories Added: None")
+            pass
+
+    def on_aboutmsedge(self, widget):
+            QMessageBox.information(self, " ", "Microsoft Edge is Microsoft's all-new release of the Microsoft Edge browser that was used in the latest version of their flagship Operating System. It shares a lot of similarities with the original Microsoft Edge. It also comes pre-bunded with the Bing search engine and a Start Page with Microsoft News integration.\n\nBased on: Chromium\nMobile Version available: Yes\nExtra Repositories Added: Coming Soon")
+            pass
+
+    def on_aboutfirefox(self, widget):
+            QMessageBox.information(self, " ", "Firefox delivers safe and easy web browsing with a familiar user interface, thousands of plugins, and integrated search that lets you get the most out of the web.\n\nBased on: N/A\nMobile Version available: Yes\nExtra Repositories Added: None")
+
+    def on_aboutbrave(self, widget):
+            QMessageBox.information(self, " ", "Brave is yet another freeware browser based on the Chromium codebase, and Blink Engine. Brave is open-source, and is designed to block Ads and Website Trackers by default, with a Donate to Support Your Favourite Websites mindset.\n\nBased on: Chromium\nMobile Version available: Yes\nExtra Repositories Added: Brave Browser's Package Repository")
+            pass
+
+    def on_aboutopera(self, widget):
+            QMessageBox.information(self, " ", "Opera is another freeware browser, being developed by Opera. The browser is built on the Blink Engine, and is designed to be feature rich, having built-in features such as an Ad Blocker, VPN, Battery Saver, and so on, all included with the browser.\n\nBased on: Chromium\nMobile Version available: Yes\nExtra Repositories Added: Opera Browser's Package Repository")
+            pass
+
+    def on_aboutcliqz(self, widget):
+            QMessageBox.information(self, " ", "Cliqz is a freeware browser based on Mozilla Firefox. This browser is built with privacy features in mind, on top of being built around the Cliqz search engine. You will find a bunch of privacy protection features including an ad-blocker and tracking blocker built-in, as well as some less commonly implemented features that may come in handy as well.\n\nBased on: Mozilla Firefox\nMobile Version available: Yes\nExtra Repositories Added: Cliqz's Official Package Repository")
+            pass
+
+    def on_aboutfalkon(self, widget):
+            QMessageBox.information(self, " ", "Falkon is KDE's browser, which has a lot of Firefox's old design traits, a familiar look and feel, pre-built-in AdBlocker, and everything else you'd expect to see from a browser in the modern age. It's still a solid choice of browser, young as it may be.\n\nBased on: QtWebEngine\nMobile Version available: No\nExtra Repositories Added: None")
+            pass
 
     def on_aboutweb(self, widget):
-            mde = Gtk.MessageDialog(self, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Web is the WebKit based\nweb browser for GNOME.\nIt offers a simple, clean,\nbeautiful view of the Web.\nIts principles are simplicity\nand standards compliance.")
-            mde.run()
-            mde.destroy()
+            QMessageBox.information(self, " ", "Web is the WebKit based web browser for GNOME. It offers a simple, clean, beautiful view of the Web. Its principles are simplicity and standards compliance.\n\nBased on: WebKitGTK\nMobile Version available: No*\nExtra Repositories Added: None\n\n* This web browser converts itself into a phone-friendly web browser on compatible phones")
             pass
 
-    def on_aboutmidori(self, widget):
-            mde = Gtk.MessageDialog(self, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Midori is a super fast,\nlightweight web browser.\nIt uses upcoming\ntechnologies like Webkit\ncombined with sensible\ndesign to create a simple\nand fast web experience.")
-            mde.run()
-            mde.destroy()
+    def on_aboutbm(self, widget):
+            QMessageBox.information(self, "About Web Browser Manager", "Web Browser Manager is a utility for managing the web browsers that you have installed on your system. Choose from a variety of browsers with just a few clicks and find the browser that is right for you in no time.\n\nCopyright (GPLv3):\n- Feren OS Developer (2015-2020)\n- AZorin (2010-2015)\n- ZorinK (2010)\n\n\nWeb Browser Manager is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See Version 3 of the GNU General Public License for more details.")
             pass
 
-    def on_close(self, widget):
-        Gtk.main_quit()
+    def on_close(self, event):
+        self.close()
 
-BrowserManager()
-Gtk.main()
+app = QApplication(sys.argv)
+ex = BrowserManager()
+sys.exit(app.exec_())

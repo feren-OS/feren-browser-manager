@@ -1,0 +1,93 @@
+#!/bin/bash
+
+###############################
+#Check if program is installed#
+###############################
+dpkg -l brave-browser |grep -q ^ii
+
+if [ $? -eq 0 ]; then
+         if [ -e "/usr/bin/brave-browser" ]; then
+                  zenity --info --title="Information" --text="Brave is already installed" --no-wrap &
+                  exit 0
+         fi
+fi
+
+################
+#Check for root#
+################
+if [ ! "$(whoami)" = "root" ]; then
+    zenity --question --title="Continue?" --text "The use of Brave is governed by the Terms of Use found at https://brave.com/terms-of-use/,
+are you sure you want to install Brave?" --no-wrap
+
+    if [ ! $? -eq 0 ]; then
+            exit
+    fi
+    
+    pkexec "$0"
+    
+    if [ $? -eq 127 ]; then
+        exit 0
+    fi
+    
+    ######################
+    #Double Check Package#
+    ######################
+    if [ -e "/usr/bin/brave-browser" ]; then
+            zenity --info --title="Installation Complete" --text="Brave was successfully installed" --no-wrap &
+            exit 0
+    fi
+    #######
+    #Error#
+    #######
+    zenity  --error --text="Feren OS couldn't install Brave successfully
+
+A log can be found at File System/tmp/brave-install-log" --title="Error" --no-wrap &
+    exit 0
+fi
+
+###############################
+#Remove Old Brave#
+###############################
+dpkg -l brave |grep -q ^ii
+
+if [ $? -eq 0 ]; then
+         if [ -e "/usr/bin/brave" ]; then
+                  apt-get -y purge brave
+                  rm -f /etc/apt/sources.list.d/brave.list
+         fi
+fi
+
+###################################
+#Check if program is not installed#
+###################################
+dpkg -l brave-browser |grep -q ^ii
+
+if [ ! $? -eq 0 ]; then
+        if [ ! -e "/usr/bin/brave-browser" ]; then
+
+#################
+#Install program#
+#################
+        #Log output
+        exec 1>/tmp/brave-install-log 2>&1
+		#Add PPA if it doesn't exist
+
+            if [ ! -f /etc/apt/sources.list.d/brave.list ]; then
+                curl -s https://brave-browser-apt-release.s3.brave.com/brave-core.asc | apt-key add -
+                if [ ! $? -eq 0 ]; then
+                    exit 1
+                fi
+                echo "deb [arch=amd64] https://brave-browser-apt-release.s3.brave.com/ `lsb_release -sc` main" | tee -a /etc/apt/sources.list.d/brave.list
+            fi
+            sleep 1
+            apt-get update
+            apt-get -y install brave-browser
+        fi
+        exit
+fi
+
+#######
+#Error#
+#######
+zenity  --error --text="An error occured while initiating the Brave installation process" --title="Error" --no-wrap &
+exit 0

@@ -1,0 +1,74 @@
+#!/bin/bash
+
+###################################
+#Check if program is not installed#
+###################################
+dpkg -l falkon |grep -q ^ii
+
+if [ ! $? -eq 0 ]; then
+         if [ ! -e "/usr/bin/falkon" ]; then
+                  zenity --info --title="Information" --text="Falkon is not installed" --no-wrap &
+                  exit 0
+         fi
+fi
+
+################
+#Check for root#
+################
+if [ ! "$(whoami)" = "root" ]; then
+    zenity --question --title="Continue?" --text "Are you sure you want to remove Falkon?" --no-wrap
+
+    if [ ! $? -eq 0 ]; then
+            exit
+    fi
+    
+    pkexec "$0" $@
+    
+    if [ $? -eq 127 ]; then
+        exit 0
+    fi
+    
+    ######################
+    #Double Check Package#
+    ######################
+    dpkg -l falkon |grep -q ^ii
+
+    if [ ! $? -eq 0 ]; then
+            if [ ! -e "/usr/bin/falkon" ]; then
+                    zenity --info --title="Uninstalled Falkon" --text="Falkon was successfully removed" --no-wrap &
+                    exit 0
+            fi
+            #######
+            #Error#
+            #######
+            zenity  --error --text="Feren OS couldn't remove Falkon successfully
+
+A log can be found at File System/tmp/falkon-removal-log" --title="Error" --no-wrap &
+            exit 0
+    fi
+fi
+
+###############################
+#Check if program is installed#
+###############################
+dpkg -l falkon |grep -q ^ii
+
+if [ $? -eq 0 ]; then
+         if [ -e "/usr/bin/falkon" ]; then
+
+###################
+#Uninstall program#
+###################
+        #Log output
+        exec 1>/tmp/falkon-removal-log 2>&1
+        
+                  apt-get -y remove falkon
+         fi
+         exit
+fi
+
+#######
+#Error#
+#######
+zenity  --error --text="An error occured while initiating the Falkon removal process" --title="Error" --no-wrap &
+exit 0

@@ -1,40 +1,55 @@
 #!/bin/bash
 
+###############################
+#Check if program is installed#
+###############################
+dpkg -l epiphany-browser |grep -q ^ii
+
+if [ $? -eq 0 ]; then
+         if [ -e "/usr/bin/epiphany-browser" ]; then
+                  zenity --info --title="Information" --text="GNOME Web is already installed" --no-wrap &
+                  exit 0
+         fi
+fi
+
 
 
 ################
 #Check for root#
 ################
-if [ ! $USERNAME = "root" ]; then
-    gksudo --description="Web Browser Manager" /usr/share/browser-manager/web/install
-    exit 0
-fi
-
-##########
-#Question#
-##########
-zenity --question --title="Continue?" --text "Are you sure you want to continue?"
-
-if [ ! $? -eq 0 ]; then
+if [ ! $(whoami) = "root" ]; then
+    zenity --question --title="Continue?" --text "Are you sure you want to install GNOME Web?" --no-wrap
+    
+    if [ ! $? -eq 0 ]; then
            exit
-fi
+    fi
 
-###############################
-#Check if program is installed#
-###############################
-dpkg --get-selections | grep -P -q "epiphany-browser\t*install"
+    pkexec "$0"
+    
+    if [ $? -eq 127 ]; then
+        exit 0
+    fi
+    
+    ######################
+    #Double Check Package#
+    ######################
+    if [ -e "/usr/bin/epiphany-browser" ]; then
+            zenity --info --title="Installation Complete" --text="GNOME Web was successfully installed" --no-wrap &
+            exit 0
+    fi
+    #######
+    #Error#
+    #######
+    zenity  --error --text="Feren OS couldn't install GNOME Web successfully
 
-if [ $? -eq 0 ]; then
-         if [ -e "/usr/bin/epiphany-browser" ]; then
-                  zenity --info --title="Information" --text="Web is already installed!"
-                  exit 0
-         fi
+A log can be found at File System/tmp/epiphany-install-log" --title="Error" --no-wrap &
+    exit 0
 fi
 
 ###################################
 #Check if program is not installed#
 ###################################
-dpkg --get-selections | grep -P -q "epiphany-browser\t*install"
+dpkg -l epiphany-browser |grep -q ^ii
 
 if [ ! $? -eq 0 ]; then
          if [ ! -e "/usr/bin/epiphany-browser" ]; then
@@ -42,28 +57,17 @@ if [ ! $? -eq 0 ]; then
 #################
 #Install program#
 #################
-                  apt-get update | zenity --progress --title="Installing..." --text="Updating package archive..." --pulsate --auto-close && apt-get -y install epiphany-browser epiphany-browser-data | zenity --progress --title="Installing..." --text="Downloading and Installing..." --pulsate --auto-close
+        #Log output
+        exec 1>/tmp/epiphany-install-log 2>&1
+        
+                  apt-get update
+                  apt-get -y install epiphany-browser epiphany-browser-data
          fi
-         ######################
-         #Double Check Package#
-         ######################
-         dpkg --get-selections | grep -P -q "epiphany-browser\t*install"
-
-         if [ $? -eq 0 ]; then
-                  if [ -e "/usr/bin/epiphany-browser" ]; then
-                           zenity --info --title="Installation Complete" --text="Web installed successfully!"
-                           exit 0
-                  fi
-                  #######
-                  #Error#
-                  #######
-                  zenity  --error --text="An error occured." --title="Error"
-                  exit 0
-         fi
+         exit
 fi
 
 #######
 #Error#
 #######
-zenity  --error --text="An error occured." --title="Error"
+zenity  --error --text="An error occured while initiating the GNOME Web installation process" --title="Error" --no-wrap &
 exit 0

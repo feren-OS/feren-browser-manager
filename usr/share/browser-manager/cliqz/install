@@ -1,0 +1,83 @@
+#!/bin/bash
+
+###############################
+#Check if program is installed#
+###############################
+dpkg -l cliqz |grep -q ^ii
+
+if [ $? -eq 0 ]; then
+         if [ -e "/usr/local/bin/cliqz" ]; then
+                  zenity --info --title="Information" --text="Cliqz is already installed" --no-wrap &
+                  exit 0
+         fi
+fi
+
+
+
+################
+#Check for root#
+################
+if [ ! $(whoami) = "root" ]; then
+    zenity --question --title="Continue?" --text "The usage of Cliqz is governed by the Privacy Policy
+found on https://cliqz.com/en/privacy-browser, are you
+sure you want to install Cliqz?" --no-wrap
+
+    if [ ! $? -eq 0 ]; then
+           exit
+    fi
+
+    pkexec "$0"
+    
+    if [ $? -eq 127 ]; then
+        exit 0
+    fi
+    
+    ######################
+    #Double Check Package#
+    ######################
+    if [ -e "/usr/local/bin/cliqz" ]; then
+            zenity --info --title="Installation Complete" --text="Cliqz was successfully installed" --no-wrap &
+            exit 0
+    fi
+    #######
+    #Error#
+    #######
+    zenity  --error --text="Feren OS couldn't install Cliqz successfully
+
+A log can be found at File System/tmp/cliqz-install-log" --title="Error" --no-wrap &
+    exit 0
+fi
+
+
+###################################
+#Check if program is not installed#
+###################################
+dpkg -l cliqz |grep -q ^ii
+
+if [ ! $? -eq 0 ]; then
+         if [ ! -e "/usr/local/bin/cliqz" ]; then
+
+#################
+#Install program#
+#################
+        #Log output
+        exec 1>/tmp/cliqz-install-log 2>&1
+        
+                if [ ! -f /etc/apt/sources.list.d/cliqz.list ]; then
+                    apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 4E0C443A
+                    if [ ! $? -eq 0 ]; then
+                        exit 1
+                    fi
+                    echo -e "deb http://repository.cliqz.com/dist/debian-release stable main" > /etc/apt/sources.list.d/cliqz.list
+                fi
+                apt-get update
+                apt-get -y install cliqz
+         fi
+         exit
+fi
+
+#######
+#Error#
+#######
+zenity  --error --text="An error occured while initiating the Cliqz installation process" --title="Error" --no-wrap &
+exit 0

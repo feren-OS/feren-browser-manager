@@ -1,0 +1,41 @@
+#!/bin/bash
+
+#Get Browser Icons if they aren't already downloaded
+if [ ! -f /tmp/firefox-logo.png ]; then
+wget https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Firefox_logo%2C_2019.svg/800px-Firefox_logo%2C_2019.svg.png -O /tmp/firefox-logo.png
+fi
+if [ ! -f /tmp/google-chrome-logo.png ]; then
+wget https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Google_Chrome_icon_%28September_2014%29.svg/1024px-Google_Chrome_icon_%28September_2014%29.svg.png -O /tmp/google-chrome-logo.png
+fi
+if [ ! -f /tmp/vivaldi-logo.png ]; then
+wget https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Vivaldi_web_browser_logo.svg/1200px-Vivaldi_web_browser_logo.svg.png -O /tmp/vivaldi-logo.png
+fi
+if [ ! -f /tmp/chromium-logo.png ]; then
+wget https://upload.wikimedia.org/wikipedia/commons/2/26/Chromium_logo.png -O /tmp/chromium-logo.png
+fi
+if [ ! -f /tmp/opera-logo.png ]; then
+wget https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Opera_2015_icon.svg/1200px-Opera_2015_icon.svg.png -O /tmp/opera-logo.png
+fi
+if [ ! -f /tmp/brave-logo.png ]; then
+wget https://images-eu.ssl-images-amazon.com/images/I/51IbhWne1lL.png -O /tmp/brave-logo.png
+fi
+if [ ! -f /tmp/falkon-logo.png ]; then
+wget https://i0.wp.com/fosslovers.com/wp-content/uploads/2018/05/falkon-logo-fosslovers.png -O /tmp/falkon-logo.png
+fi
+if [ ! -f /tmp/cliqz-logo.png ]; then
+wget https://static-website.cliqz.com/wp-content/uploads/2016/07/Primary-Cliqz-Logo-1.png -O /tmp/cliqz-logo.png
+fi
+if [ ! -f /tmp/microsoft-edge-logo.png ]; then
+wget https://upload.wikimedia.org/wikipedia/en/thumb/9/98/Microsoft_Edge_logo_%282019%29.svg/320px-Microsoft_Edge_logo_%282019%29.svg.png -O /tmp/microsoft-edge-logo.png
+fi
+browsericonfiles="/tmp/microsoft-edge-logo.png /tmp/cliqz-logo.png /tmp/falkon-logo.png /tmp/brave-logo.png /tmp/opera-logo.png /tmp/chromium-logo.png /tmp/vivaldi-logo.png /tmp/google-chrome-logo.png /tmp/firefox-logo.png"
+chmod 755 $browsericonfiles
+#Check if the browser icons successfully downloaded - if they didn't remove the dummy files produced
+for browsericonfile in $browsericonfiles; do
+    if [ ! "$(file -b --mime-type $browsericonfile)" = "image/png" ]; then
+        rm -f "$browsericonfile"
+    fi
+done
+
+#Launch Web Browser Manager
+/usr/bin/browser-manager

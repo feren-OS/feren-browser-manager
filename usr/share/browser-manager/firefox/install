@@ -1,40 +1,57 @@
 #!/bin/bash
 
+###############################
+#Check if program is installed#
+###############################
+dpkg -l firefox |grep -q ^ii
+
+if [ $? -eq 0 ]; then
+         if [ -e "/usr/bin/firefox" ]; then
+                  zenity --info --title="Information" --text="Mozilla Firefox is already installed" --no-wrap &
+                  exit 0
+         fi
+fi
+
 
 
 ################
 #Check for root#
 ################
-if [ ! $USERNAME = "root" ]; then
-    gksudo --description="Web Browser Manager" /usr/share/browser-manager/firefox/install
-    exit 0
-fi
+if [ ! $(whoami) = "root" ]; then
+    zenity --question --title="Continue?" --text "The use of Mozilla Firefox is governed by the Terms found at
+https://www.mozilla.org/en-US/about/legal/terms/firefox/,
+are you sure you want to install Mozilla Firefox?" --no-wrap
 
-##########
-#Question#
-##########
-zenity --question --title="Continue?" --text "Are you sure you want to continue?"
-
-if [ ! $? -eq 0 ]; then
+    if [ ! $? -eq 0 ]; then
            exit
-fi
+    fi
 
-###############################
-#Check if program is installed#
-###############################
-dpkg --get-selections | grep -P -q "firefox\t*install"
+    pkexec "$0"
+    
+    if [ $? -eq 127 ]; then
+        exit 0
+    fi
+    
+    ######################
+    #Double Check Package#
+    ######################
+    if [ -e "/usr/bin/firefox" ]; then
+            zenity --info --title="Installation Complete" --text="Mozilla Firefox was successfully installed" --no-wrap &
+            exit 0
+    fi
+    #######
+    #Error#
+    #######
+    zenity  --error --text="Feren OS couldn't install Mozilla Firefox successfully
 
-if [ $? -eq 0 ]; then
-         if [ -e "/usr/bin/firefox" ]; then
-                  zenity --info --title="Information" --text="Firefox is already installed!"
-                  exit 0
-         fi
+A log can be found at File System/tmp/firefox-install-log" --title="Error" --no-wrap &
+    exit 0
 fi
 
 ###################################
 #Check if program is not installed#
 ###################################
-dpkg --get-selections | grep -P -q "firefox\t*install"
+dpkg -l firefox |grep -q ^ii
 
 if [ ! $? -eq 0 ]; then
          if [ ! -e "/usr/bin/firefox" ]; then
@@ -42,28 +59,17 @@ if [ ! $? -eq 0 ]; then
 #################
 #Install program#
 #################
-                  apt-get update | zenity --progress --title="Installing..." --text="Updating package archive..." --pulsate --auto-close && apt-get -y install firefox | zenity --progress --title="Installing..." --text="Downloading and Installing..." --pulsate --auto-close
+        #Log output
+        exec 1>/tmp/firefox-install-log 2>&1
+        
+                  apt-get update
+                  apt-get -y install firefox
          fi
-         ######################
-         #Double Check Package#
-         ######################
-         dpkg --get-selections | grep -P -q "firefox\t*install"
-
-         if [ $? -eq 0 ]; then
-                  if [ -e "/usr/bin/firefox" ]; then
-                           zenity --info --title="Installation Complete" --text="Firefox installed successfully!"
-                           exit 0
-                  fi
-                  #######
-                  #Error#
-                  #######
-                  zenity  --error --text="An error occured." --title="Error"
-                  exit 0
-         fi
+         exit
 fi
 
 #######
 #Error#
 #######
-zenity  --error --text="An error occured." --title="Error"
+zenity  --error --text="An error occured while initiating the Mozilla Firefox installation process." --title="Error" --no-wrap &
 exit 0

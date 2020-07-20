@@ -3,10 +3,10 @@
 ###############################
 #Check if program is installed#
 ###############################
-dpkg -l chromium-browser |grep -q ^ii
+dpkg -l chromium |grep -q ^ii
 
 if [ $? -eq 0 ]; then
-         if [ -e "/usr/bin/chromium-browser" ]; then
+         if [ -e "/usr/bin/chromium" ]; then
                   zenity --info --title="Information" --text="Chromium is already installed" --no-wrap &
                   exit 0
          fi
@@ -31,7 +31,7 @@ if [ ! $(whoami) = "root" ]; then
     ######################
     #Double Check Package#
     ######################
-    if [ -e "/usr/bin/chromium-browser" ]; then
+    if [ -e "/usr/bin/chromium" ]; then
             zenity --info --title="Installation Complete" --text="Chromium was successfully installed" --no-wrap &
             exit 0
     fi
@@ -47,10 +47,10 @@ fi
 ###################################
 #Check if program is not installed#
 ###################################
-dpkg -l chromium-browser |grep -q ^ii
+dpkg -l chromium |grep -q ^ii
 
 if [ ! $? -eq 0 ]; then
-         if [ ! -e "/usr/bin/chromium-browser" ]; then
+         if [ ! -e "/usr/bin/chromium" ]; then
 
 #################
 #Install program#
@@ -58,8 +58,45 @@ if [ ! $? -eq 0 ]; then
         #Log output
         exec 1>/tmp/chromium-install-log 2>&1
         
+        #Add Debian Buster's repository and restrict it to just chromium
+        apt-key adv --keyserver hkps://keyserver.ubuntu.com:443 --recv-keys DCC9EFBF77E11517
+        apt-key adv --keyserver hkps://keyserver.ubuntu.com:443 --recv-keys 648ACFD622F3D138
+        apt-key adv --keyserver hkps://keyserver.ubuntu.com:443 --recv-keys 112695A0E562B32A
+        echo "deb https://deb.debian.org/debian buster main
+deb https://deb.debian.org/debian buster-updates main
+deb http://security.debian.org/ buster/updates main" > /etc/apt/sources.list.d/debian-buster.list
+        echo '# Do not install anything other than chromium from the Debian repos
+Package: *
+Pin: origin "deb.debian.org"
+Pin-Priority: 1
+
+# Do not install anything other than chromium from the Debian repos
+Package: *
+Pin: origin "security.debian.org"
+Pin-Priority: 1
+
+# Exclude the game chromium-bsu
+Package: chromium-bsu*
+Pin: origin "deb.debian.org"
+Pin-Priority: 1
+
+# Exclude the game chromium-bsu
+Package: chromium-bsu*
+Pin: origin "security.debian.org"
+Pin-Priority: 1
+
+# Pattern includes "chromium"
+Package: chromium*
+Pin: origin "deb.debian.org"
+Pin-Priority: 700
+
+# Pattern includes "chromium"
+Package: chromium*
+Pin: origin "security.debian.org"
+Pin-Priority: 700' > /etc/apt/preferences.d/debian-only-chromium.pref
+        
                   apt-get update
-                  apt-get -y install chromium-browser
+                  apt-get -y install chromium
          fi
          exit
 fi

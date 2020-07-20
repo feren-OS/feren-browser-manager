@@ -3,10 +3,10 @@
 ###################################
 #Check if program is not installed#
 ###################################
-dpkg -l chromium-browser |grep -q ^ii
+dpkg -l chromium |grep -q ^ii
 
 if [ ! $? -eq 0 ]; then
-         if [ ! -e "/usr/bin/chromium-browser" ]; then
+         if [ ! -e "/usr/bin/chromium" ]; then
                   zenity --info --title="Information" --text="Chromium is not installed" --no-wrap &
                   exit 0
          fi
@@ -31,10 +31,10 @@ if [ ! "$(whoami)" = "root" ]; then
     ######################
     #Double Check Package#
     ######################
-    dpkg -l chromium-browser |grep -q ^ii
+    dpkg -l chromium |grep -q ^ii
 
     if [ ! $? -eq 0 ]; then
-            if [ ! -e "chromium-browser" ]; then
+            if [ ! -e "/usr/bin/chromium" ]; then
                     zenity --info --title="Uninstalled Chromium" --text="Chromium was successfully removed" --no-wrap &
                     exit 0
             fi
@@ -51,10 +51,10 @@ fi
 ###############################
 #Check if program is installed#
 ###############################
-dpkg -l chromium-browser |grep -q ^ii
+dpkg -l chromium |grep -q ^ii
 
 if [ $? -eq 0 ]; then
-         if [ -e "/usr/bin/chromium-browser" ]; then
+         if [ -e "/usr/bin/chromium" ]; then
 
 ###################
 #Uninstall program#
@@ -62,7 +62,8 @@ if [ $? -eq 0 ]; then
         #Log output
         exec 1>/tmp/chromium-removal-log 2>&1
         
-                  apt-get -y remove chromium-browser
+                  apt-get -y remove chromium
+                  rm -f /etc/apt/preferences.d/debian-only-chromium.pref /etc/apt/sources.list.d/debian-buster.list
          fi
          exit
 fi

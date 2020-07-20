@@ -634,7 +634,7 @@ class BrowserManager(QMainWindow):
             self.uninstvivaldi.setVisible(False)
             self.instvivaldi.setVisible(True)
 
-        if os.path.isfile("/usr/bin/chromium-browser"):
+        if os.path.isfile("/usr/bin/chromium"):
             self.instchromium.setVisible(False)
             self.uninstchromium.setVisible(True)
         else:
@@ -867,7 +867,7 @@ class BrowserManager(QMainWindow):
             QMessageBox.information(self, " ", "Google Chrome is an web browser project backed by Google that aims to build a safer, faster, and more stable way for all internet users to experience the web.\n\nBased on: Chromium\nMobile Version available: Yes\nExtra Repositories Added: Google Chrome's (Stable) Package Repository")
 
     def on_aboutchromium(self, widget):
-            QMessageBox.information(self, " ", "Chromium is the open source father of Google Chrome, also being mainly made by Google. It shares a lot of the GUI that Google Chrome has, but with an alternative logo and some other features missing such as codecs being pre-installed, and so on.\n\nBased on: N/A\nMobile Version available: Yes\nExtra Repositories Added: None")
+            QMessageBox.information(self, " ", "Chromium is the open source father of Google Chrome, also being mainly made by Google. It shares a lot of the GUI that Google Chrome has, but with an alternative logo and some other features missing such as codecs being pre-installed, and so on.\n\nBased on: N/A\nMobile Version available: Yes\nExtra Repositories Added: Debian Buster (just Chromium)")
             pass
 
     def on_aboutmsedge(self, widget):

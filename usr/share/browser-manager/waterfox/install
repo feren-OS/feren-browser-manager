@@ -1,0 +1,83 @@
+#!/bin/bash
+
+###############################
+#Check if program is installed#
+###############################
+dpkg -l waterfox-current-kde |grep -q ^ii
+
+if [ $? -eq 0 ]; then
+         if [ -e "/usr/bin/waterfox-current" ]; then
+                  zenity --info --title="Information" --text="Waterfox is already installed" --no-wrap &
+                  exit 0
+         fi
+fi
+
+
+
+################
+#Check for root#
+################
+if [ ! $(whoami) = "root" ]; then
+    zenity --question --title="Continue?" --text "The usage of Waterfox is governed by the Privacy Policy
+found on https://www.waterfox.net/privacy/, are you
+sure you want to install Waterfox?" --no-wrap
+
+    if [ ! $? -eq 0 ]; then
+           exit
+    fi
+
+    pkexec "$0"
+    
+    if [ $? -eq 127 ]; then
+        exit 0
+    fi
+    
+    ######################
+    #Double Check Package#
+    ######################
+    if [ -e "/usr/bin/waterfox-current" ]; then
+            zenity --info --title="Installation Complete" --text="Waterfox was successfully installed" --no-wrap &
+            exit 0
+    fi
+    #######
+    #Error#
+    #######
+    zenity  --error --text="Feren OS couldn't install Waterfox successfully
+
+A log can be found at File System/tmp/waterfox-install-log" --title="Error" --no-wrap &
+    exit 0
+fi
+
+
+###################################
+#Check if program is not installed#
+###################################
+dpkg -l waterfox-current-kde |grep -q ^ii
+
+if [ ! $? -eq 0 ]; then
+         if [ ! -e "/usr/bin/waterfox-current" ]; then
+
+#################
+#Install program#
+#################
+        #Log output
+        exec 1>/tmp/waterfox-install-log 2>&1
+        
+                if [ ! -f /etc/apt/sources.list.d/waterfox.list ]; then
+                    wget -nv https://download.opensuse.org/repositories/home:hawkeye116477:waterfox/xUbuntu_18.04/Release.key -O "/etc/apt/trusted.gpg.d/home:hawkeye116477:waterfox.asc"
+                    if [ ! $? -eq 0 ]; then
+                        exit 1
+                    fi
+                    echo -e "deb http://download.opensuse.org/repositories/home:/hawkeye116477:/waterfox/xUbuntu_18.04/ /" > /etc/apt/sources.list.d/waterfox.list
+                fi
+                apt-get update
+                apt-get -y install waterfox-current-kde
+         fi
+         exit
+fi
+
+#######
+#Error#
+#######
+zenity  --error --text="An error occured while initiating the Waterfox installation process" --title="Error" --no-wrap &
+exit 0

@@ -93,7 +93,7 @@ class BrowserManager(QMainWindow):
         global imgbr
         global imgfa
         global imagemse
-        global imagecz
+        global imagewf
 
         is_64bits = sys.maxsize > 2**32
     
@@ -227,24 +227,24 @@ class BrowserManager(QMainWindow):
             self.instopera.setEnabled(False)
             self.instopera.setToolTip("Not Available in 32 Bit Feren OS")
         
-        #Cliqz
-        self.uninstcliqz = QPushButton("Uninstall", self)       
-        self.uninstcliqz.clicked.connect(self.on_uninstcliqz)
-        self.uninstcliqz.setFixedSize(87, 30)
+        #Waterfox
+        self.uninstwaterfox = QPushButton("Uninstall", self)       
+        self.uninstwaterfox.clicked.connect(self.on_uninstwaterfox)
+        self.uninstwaterfox.setFixedSize(87, 30)
  
-        self.uninstcliqz.move(360, 315)
+        self.uninstwaterfox.move(360, 315)
 
-        self.uninstcliqz.setToolTip("Uninstall Cliqz")
-        self.instcliqz = QPushButton("Install", self)
-        self.instcliqz.clicked.connect(self.on_instcliqz)
-        self.instcliqz.setFixedSize(87, 30)
+        self.uninstwaterfox.setToolTip("Uninstall Waterfox")
+        self.instwaterfox = QPushButton("Install", self)
+        self.instwaterfox.clicked.connect(self.on_instwaterfox)
+        self.instwaterfox.setFixedSize(87, 30)
 
-        self.instcliqz.move(360, 315)
+        self.instwaterfox.move(360, 315)
 
-        self.instcliqz.setToolTip("Install Cliqz")
+        self.instwaterfox.setToolTip("Install Waterfox")
         if is_64bits == False:
-            self.instcliqz.setEnabled(False)
-            self.instcliqz.setToolTip("Not Available in 32 Bit Feren OS")
+            self.instwaterfox.setEnabled(False)
+            self.instwaterfox.setToolTip("Not Available in 32 Bit Feren OS")
 
         #Falkon
         self.uninstfalkon = QPushButton("Uninstall", self)      
@@ -311,7 +311,7 @@ class BrowserManager(QMainWindow):
         operalabel = QLabel("", self) 
         bravelabel = QLabel("", self) 
         msedgelabel = QLabel("", self)
-        cliqzlabel = QLabel("", self)
+        waterfoxlabel = QLabel("", self)
         falkonlabel = QLabel("", self)
         
         boldFont=QtGui.QFont()
@@ -333,8 +333,8 @@ class BrowserManager(QMainWindow):
         bravelabel.setFont(boldFont)
         msedgelabel.setText("Microsoft Edge")
         msedgelabel.setFont(boldFont)
-        cliqzlabel.setText("Cliqz")
-        cliqzlabel.setFont(boldFont)
+        waterfoxlabel.setText("Waterfox")
+        waterfoxlabel.setFont(boldFont)
         falkonlabel.setText("Falkon")
         falkonlabel.setFont(boldFont)
         
@@ -373,10 +373,10 @@ class BrowserManager(QMainWindow):
         operalabel.setFixedWidth(labelwidth)
         operalabel.setAlignment(Qt.AlignCenter)
         
-        labelwidth = cliqzlabel.fontMetrics().boundingRect(cliqzlabel.text()).width()
-        cliqzlabel.move((365 + 37.5 - (0.5 * labelwidth)), 190)
-        cliqzlabel.setFixedWidth(labelwidth)
-        cliqzlabel.setAlignment(Qt.AlignCenter)
+        labelwidth = waterfoxlabel.fontMetrics().boundingRect(waterfoxlabel.text()).width()
+        waterfoxlabel.move((365 + 37.5 - (0.5 * labelwidth)), 190)
+        waterfoxlabel.setFixedWidth(labelwidth)
+        waterfoxlabel.setAlignment(Qt.AlignCenter)
         
         labelwidth = falkonlabel.fontMetrics().boundingRect(falkonlabel.text()).width()
         falkonlabel.move((530 + 37.5 - (0.5 * labelwidth)), 190)
@@ -430,10 +430,10 @@ class BrowserManager(QMainWindow):
         else:
             imgfa = '/usr/share/icons/Inspire/96/apps/internet-web-browser.png'
 
-        if os.path.exists('/tmp/cliqz-logo.png'):
-            imgcz = '/tmp/cliqz-logo.png'
+        if os.path.exists('/tmp/waterfox-logo.png'):
+            imgwf = '/tmp/waterfox-logo.png'
         else:
-            imgcz = '/usr/share/icons/Inspire/96/apps/internet-web-browser.png'
+            imgwf = '/usr/share/icons/Inspire/96/apps/internet-web-browser.png'
 
         if os.path.exists('/tmp/microsoft-edge-logo.png'):
             imgmse = '/tmp/microsoft-edge-logo.png'
@@ -510,15 +510,15 @@ class BrowserManager(QMainWindow):
 
         self.aboutopera.setToolTip("About Opera")
 
-        self.aboutcliqz = QPushButton('', self)
-        self.aboutcliqz.setIcon(QtGui.QIcon(imgcz))
-        self.aboutcliqz.setIconSize(QtCore.QSize(65,65))
-        self.aboutcliqz.clicked.connect(self.on_aboutcliqz)
-        self.aboutcliqz.setFixedSize(75, 75)
+        self.aboutwaterfox = QPushButton('', self)
+        self.aboutwaterfox.setIcon(QtGui.QIcon(imgwf))
+        self.aboutwaterfox.setIconSize(QtCore.QSize(65,65))
+        self.aboutwaterfox.clicked.connect(self.on_aboutwaterfox)
+        self.aboutwaterfox.setFixedSize(75, 75)
 
-        self.aboutcliqz.move(365, 220)
+        self.aboutwaterfox.move(365, 220)
 
-        self.aboutcliqz.setToolTip("About Cliqz")
+        self.aboutwaterfox.setToolTip("About Waterfox")
 
         self.aboutfalkon = QPushButton('', self)
         self.aboutfalkon.setIcon(QtGui.QIcon(imgfa))
@@ -557,7 +557,7 @@ class BrowserManager(QMainWindow):
         self.instbrave.setEnabled(True)
         self.instfalkon.setEnabled(True)
         self.instmsedge.setEnabled(True)
-        self.instcliqz.setEnabled(True)
+        self.instwaterfox.setEnabled(True)
         self.uninstfirefox.setEnabled(True)
         self.uninstchrome.setEnabled(True)
         self.uninstweb.setEnabled(True)
@@ -567,7 +567,7 @@ class BrowserManager(QMainWindow):
         self.uninstbrave.setEnabled(True)
         self.uninstfalkon.setEnabled(True)
         self.uninstmsedge.setEnabled(True)
-        self.uninstcliqz.setEnabled(True)
+        self.uninstwaterfox.setEnabled(True)
         self.closebtn.setEnabled(True)
         self.browserwork = False
         self.on_refresh()
@@ -578,7 +578,7 @@ class BrowserManager(QMainWindow):
             self.instbrave.setEnabled(False)
             self.instopera.setEnabled(False)
             self.instchrome.setEnabled(False)
-            self.instcliqz.setEnabled(False)
+            self.instwaterfox.setEnabled(False)
         
     def begin_process(self):
         self.instfirefox.setEnabled(False)
@@ -590,7 +590,7 @@ class BrowserManager(QMainWindow):
         self.instbrave.setEnabled(False)
         self.instfalkon.setEnabled(False)
         self.instmsedge.setEnabled(False)
-        self.instcliqz.setEnabled(False)
+        self.instwaterfox.setEnabled(False)
         self.uninstfirefox.setEnabled(False)
         self.uninstchrome.setEnabled(False)
         self.uninstweb.setEnabled(False)
@@ -600,7 +600,7 @@ class BrowserManager(QMainWindow):
         self.uninstbrave.setEnabled(False)
         self.uninstfalkon.setEnabled(False)
         self.uninstmsedge.setEnabled(False)
-        self.uninstcliqz.setEnabled(False)
+        self.uninstwaterfox.setEnabled(False)
         self.closebtn.setEnabled(False)
         self.browserwork = True
         self.progressbar1.setVisible(True)
@@ -672,12 +672,12 @@ class BrowserManager(QMainWindow):
         self.instmsedge.setVisible(True)
         self.instmsedge.setEnabled(False)
     
-        if os.path.isfile("/usr/local/bin/cliqz"):
-            self.instcliqz.setVisible(False)
-            self.uninstcliqz.setVisible(True)
+        if os.path.isfile("/usr/bin/waterfox-current"):
+            self.instwaterfox.setVisible(False)
+            self.uninstwaterfox.setVisible(True)
         else:
-            self.uninstcliqz.setVisible(False)
-            self.instcliqz.setVisible(True)
+            self.uninstwaterfox.setVisible(False)
+            self.instwaterfox.setVisible(True)
 
     def on_instvivaldi(self, widget):                                 
         self.begin_process()
@@ -742,12 +742,12 @@ class BrowserManager(QMainWindow):
         )
         t.start()
 
-    def on_instcliqz(self, widget):                                 
+    def on_instwaterfox(self, widget):                                 
         self.begin_process()
         self.progressbar1.move(361, 316)
         t = Thread(
             target=BrowserManagerManager,
-            args=("cliqz", "install", self)
+            args=("waterfox", "install", self)
         )
         t.start()
 
@@ -832,12 +832,12 @@ class BrowserManager(QMainWindow):
         )
         t.start()
 
-    def on_uninstcliqz(self, widget):                               
+    def on_uninstwaterfox(self, widget):                               
         self.begin_process()
         self.progressbar1.move(361, 316)
         t = Thread(
             target=BrowserManagerManager,
-            args=("cliqz", "uninstall", self)
+            args=("waterfox", "uninstall", self)
         )
         t.start()
 
@@ -885,8 +885,8 @@ class BrowserManager(QMainWindow):
             QMessageBox.information(self, " ", "Opera is another freeware browser, being developed by Opera. The browser is built on the Blink Engine, and is designed to be feature rich, having built-in features such as an Ad Blocker, VPN, Battery Saver, and so on, all included with the browser.\n\nBased on: Chromium\nMobile Version available: Yes\nExtra Repositories Added: Opera Browser's Package Repository")
             pass
 
-    def on_aboutcliqz(self, widget):
-            QMessageBox.information(self, " ", "Cliqz is a freeware browser based on Mozilla Firefox. This browser is built with privacy features in mind, on top of being built around the Cliqz search engine. You will find a bunch of privacy protection features including an ad-blocker and tracking blocker built-in, as well as some less commonly implemented features that may come in handy as well.\n\nBased on: Mozilla Firefox\nMobile Version available: Yes\nExtra Repositories Added: Cliqz's Official Package Repository")
+    def on_aboutwaterfox(self, widget):
+            QMessageBox.information(self, " ", "Waterfox is a freeware browser based on Mozilla Firefox. This browser is built with a mix of privacy and customisability in mind. This browser has a big focus on stability and limiting data collection while staying true to the browser's base.\n\nBased on: Mozilla Firefox\nMobile Version available: No\nExtra Repositories Added: Unofficial Waterfox Package Repository")
             pass
 
     def on_aboutfalkon(self, widget):

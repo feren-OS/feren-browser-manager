@@ -22,8 +22,8 @@ fi
 if [ ! -f /tmp/falkon-logo.png ]; then
 wget https://i0.wp.com/fosslovers.com/wp-content/uploads/2018/05/falkon-logo-fosslovers.png -O /tmp/falkon-logo.png
 fi
-if [ ! -f /tmp/cliqz-logo.png ]; then
-wget https://static-website.cliqz.com/wp-content/uploads/2016/07/Primary-Cliqz-Logo-1.png -O /tmp/cliqz-logo.png
+if [ ! -f /tmp/waterfox-logo.png ]; then
+wget https://upload.wikimedia.org/wikipedia/en/b/b5/Waterfox_Logo_June_2019.png -O /tmp/waterfox-logo.png
 fi
 if [ ! -f /tmp/microsoft-edge-logo.png ]; then
 wget https://upload.wikimedia.org/wikipedia/en/thumb/9/98/Microsoft_Edge_logo_%282019%29.svg/320px-Microsoft_Edge_logo_%282019%29.svg.png -O /tmp/microsoft-edge-logo.png

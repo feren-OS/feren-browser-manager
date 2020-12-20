@@ -64,7 +64,8 @@ if [ ! $? -eq 0 ]; then
         exec 1>/tmp/waterfox-install-log 2>&1
         
                 if [ ! -f /etc/apt/sources.list.d/waterfox.list ]; then
-                    wget -nv https://download.opensuse.org/repositories/home:hawkeye116477:waterfox/xUbuntu_18.04/Release.key -O "/etc/apt/trusted.gpg.d/home:hawkeye116477:waterfox.asc"
+                    wget -nv https://download.opensuse.org/repositories/home:hawkeye116477:waterfox/xUbuntu_18.04/Release.key -O "/tmp/home:hawkeye116477:waterfox.key"
+                    apt-key add - < "/tmp/home:hawkeye116477:waterfox.key"
                     if [ ! $? -eq 0 ]; then
                         exit 1
                     fi

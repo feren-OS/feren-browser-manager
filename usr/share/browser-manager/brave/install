@@ -73,11 +73,11 @@ if [ ! $? -eq 0 ]; then
 		#Add PPA if it doesn't exist
 
             if [ ! -f /etc/apt/sources.list.d/brave.list ]; then
-                curl -s https://brave-browser-apt-release.s3.brave.com/brave-core.asc | apt-key add -
+                curl -s https://brave-browser-apt-release.s3.brave.com/brave-core.asc | sudo apt-key --keyring /etc/apt/trusted.gpg.d/brave-browser-release.gpg add -
                 if [ ! $? -eq 0 ]; then
                     exit 1
                 fi
-                echo "deb [arch=amd64] https://brave-browser-apt-release.s3.brave.com/ `lsb_release -sc` main" | tee -a /etc/apt/sources.list.d/brave.list
+                echo "deb [arch=amd64] https://brave-browser-apt-release.s3.brave.com/ stable main" | tee -a /etc/apt/sources.list.d/brave.list
             fi
             sleep 1
             apt-get update

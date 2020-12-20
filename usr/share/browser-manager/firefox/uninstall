@@ -3,13 +3,11 @@
 ###################################
 #Check if program is not installed#
 ###################################
-dpkg -l firefox |grep -q ^ii
+flatpak list | grep org.mozilla.firefox
 
-if [ ! $? -eq 0 ]; then
-         if [ ! -e "/usr/bin/firefox" ]; then
-                  zenity --info --title="Information" --text="Mozilla Firefox is not installed" --no-wrap &
-                  exit 0
-         fi
+if [ ! $? -eq 0 ] && [ ! -f /usr/bin/firefox ]; then
+    zenity --info --title="Information" --text="Mozilla Firefox is not installed" --no-wrap &
+    exit 0
 fi
 
 ################
@@ -31,30 +29,27 @@ if [ ! "$(whoami)" = "root" ]; then
     ######################
     #Double Check Package#
     ######################
-    dpkg -l firefox |grep -q ^ii
+    flatpak list | grep org.mozilla.firefox
 
-    if [ ! $? -eq 0 ]; then
-            if [ ! -e "/usr/bin/firefox" ]; then
-                    zenity --info --title="Uninstalled Mozilla Firefox" --text="Mozilla Firefox was successfully removed" --no-wrap &
-                    exit 0
-            fi
+    if [ ! $? -eq 0 ] && [ ! -f /usr/bin/firefox ]; then
+        zenity --info --title="Uninstalled Mozilla Firefox" --text="Mozilla Firefox was successfully removed" --no-wrap &
+        exit 0
             #######
             #Error#
             #######
-            zenity  --error --text="Feren OS couldn't remove Mozilla Firefox successfully
+    fi
+    zenity  --error --text="Feren OS couldn't remove Mozilla Firefox successfully
 
 A log can be found at File System/tmp/firefox-removal-log" --title="Error" --no-wrap &
-            exit 0
-    fi
+    exit 0
 fi
 
 ###############################
 #Check if program is installed#
 ###############################
-dpkg -l firefox |grep -q ^ii
+flatpak list | grep org.mozilla.firefox
 
-if [ $? -eq 0 ]; then
-         if [ -e "/usr/bin/firefox" ]; then
+if [ $? -eq 0 ] || [ -f /usr/bin/firefox ]; then
 
 ###################
 #Uninstall program#
@@ -62,9 +57,9 @@ if [ $? -eq 0 ]; then
         #Log output
         exec 1>/tmp/firefox-removal-log 2>&1
         
-                  apt-get -y remove firefox
-         fi
-         exit
+        flatpak remove org.mozilla.firefox -y
+        if [ -f "/usr/bin/firefox" ]; then apt purge firefox -y; fi #Legacy support
+        exit
 fi
 
 #######

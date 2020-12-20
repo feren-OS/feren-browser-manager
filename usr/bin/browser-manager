@@ -32,6 +32,7 @@ import os
 from os import path
 import sys
 from threading import Thread
+import time
 
 QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
 
@@ -157,6 +158,15 @@ class BrowserManager(QMainWindow):
         self.uninstmsedge.move(525, 130)
 
         self.uninstmsedge.setToolTip("Uninstall Microsoft Edge")
+        
+        ##It's a secret.
+        self.instmsedgeee = QPushButton("...", self)
+        self.instmsedgeee.clicked.connect(self.on_instmsedge)
+        self.instmsedgeee.setFixedSize(87, 30)
+
+        self.instmsedgeee.move(525, 130)
+        
+        
         self.instmsedge = QPushButton("Install", self)
         self.instmsedge.clicked.connect(self.on_instmsedge)
         self.instmsedge.setFixedSize(87, 30)
@@ -292,7 +302,7 @@ class BrowserManager(QMainWindow):
         
         self.progressbar1 = QProgressBar(self)
         self.progressbar1.setRange(0,1)
-        self.progressbar1.setFixedSize(85, 28)
+        self.progressbar1.setFixedSize(125, 28)
         self.progressbar1.move(10, 405)
         self.progressbar1.setMinimum(0)
         self.progressbar1.setMaximum(0)
@@ -548,65 +558,66 @@ class BrowserManager(QMainWindow):
 ##############################
 
     def finish_process(self):
-        self.instfirefox.setEnabled(True)
-        self.instchrome.setEnabled(True)
-        self.instweb.setEnabled(True)
-        self.instvivaldi.setEnabled(True)
-        self.instchromium.setEnabled(True)
-        self.instopera.setEnabled(True)
-        self.instbrave.setEnabled(True)
-        self.instfalkon.setEnabled(True)
-        self.instmsedge.setEnabled(True)
-        self.instwaterfox.setEnabled(True)
-        self.uninstfirefox.setEnabled(True)
-        self.uninstchrome.setEnabled(True)
-        self.uninstweb.setEnabled(True)
-        self.uninstvivaldi.setEnabled(True)
-        self.uninstchromium.setEnabled(True)
-        self.uninstopera.setEnabled(True)
-        self.uninstbrave.setEnabled(True)
-        self.uninstfalkon.setEnabled(True)
-        self.uninstmsedge.setEnabled(True)
-        self.uninstwaterfox.setEnabled(True)
-        self.closebtn.setEnabled(True)
+        #self.instfirefox.setEnabled(True)
+        #self.instchrome.setEnabled(True)
+        #self.instweb.setEnabled(True)
+        #self.instvivaldi.setEnabled(True)
+        #self.instchromium.setEnabled(True)
+        #self.instopera.setEnabled(True)
+        #self.instbrave.setEnabled(True)
+        #self.instfalkon.setEnabled(True)
+        #self.instmsedge.setEnabled(True)
+        #self.instwaterfox.setEnabled(True)
+        #self.uninstfirefox.setEnabled(True)
+        #self.uninstchrome.setEnabled(True)
+        #self.uninstweb.setEnabled(True)
+        #self.uninstvivaldi.setEnabled(True)
+        #self.uninstchromium.setEnabled(True)
+        #self.uninstopera.setEnabled(True)
+        #self.uninstbrave.setEnabled(True)
+        #self.uninstfalkon.setEnabled(True)
+        #self.uninstmsedge.setEnabled(True)
+        #self.uninstwaterfox.setEnabled(True)
+        self.closebtn.setVisible(True)
         self.browserwork = False
         self.on_refresh()
         self.progressbar1.setVisible(False)
         self.progressbar1.move(10, 405)
-        is_64bits = sys.maxsize > 2**32
-        if is_64bits == False:
-            self.instbrave.setEnabled(False)
-            self.instopera.setEnabled(False)
-            self.instchrome.setEnabled(False)
-            self.instwaterfox.setEnabled(False)
+        #is_64bits = sys.maxsize > 2**32
+        #if is_64bits == False:
+            #self.instbrave.setEnabled(False)
+            #self.instopera.setEnabled(False)
+            #self.instchrome.setEnabled(False)
+            #self.instwaterfox.setEnabled(False)
         
     def begin_process(self):
-        self.instfirefox.setEnabled(False)
-        self.instchrome.setEnabled(False)
-        self.instweb.setEnabled(False)
-        self.instvivaldi.setEnabled(False)
-        self.instchromium.setEnabled(False)
-        self.instopera.setEnabled(False)
-        self.instbrave.setEnabled(False)
-        self.instfalkon.setEnabled(False)
-        self.instmsedge.setEnabled(False)
-        self.instwaterfox.setEnabled(False)
-        self.uninstfirefox.setEnabled(False)
-        self.uninstchrome.setEnabled(False)
-        self.uninstweb.setEnabled(False)
-        self.uninstvivaldi.setEnabled(False)
-        self.uninstchromium.setEnabled(False)
-        self.uninstopera.setEnabled(False)
-        self.uninstbrave.setEnabled(False)
-        self.uninstfalkon.setEnabled(False)
-        self.uninstmsedge.setEnabled(False)
-        self.uninstwaterfox.setEnabled(False)
-        self.closebtn.setEnabled(False)
+        self.instfirefox.setVisible(False)
+        self.instchrome.setVisible(False)
+        self.instweb.setVisible(False)
+        self.instvivaldi.setVisible(False)
+        self.instchromium.setVisible(False)
+        self.instopera.setVisible(False)
+        self.instbrave.setVisible(False)
+        self.instfalkon.setVisible(False)
+        self.instmsedge.setVisible(False)
+        self.instmsedgeee.setVisible(False)
+        self.instwaterfox.setVisible(False)
+        self.uninstfirefox.setVisible(False)
+        self.uninstchrome.setVisible(False)
+        self.uninstweb.setVisible(False)
+        self.uninstvivaldi.setVisible(False)
+        self.uninstchromium.setVisible(False)
+        self.uninstopera.setVisible(False)
+        self.uninstbrave.setVisible(False)
+        self.uninstfalkon.setVisible(False)
+        self.uninstmsedge.setVisible(False)
+        self.uninstwaterfox.setVisible(False)
+        self.closebtn.setVisible(False)
         self.browserwork = True
         self.progressbar1.setVisible(True)
   
     def on_refresh(self):
-        if os.path.isfile("/usr/bin/firefox"):
+        if os.path.isdir("/var/lib/flatpak/app/org.mozilla.firefox") or os.path.isfile("/usr/bin/firefox"):
             self.instfirefox.setVisible(False)
             self.uninstfirefox.setVisible(True)
         else:
@@ -662,14 +673,18 @@ class BrowserManager(QMainWindow):
             self.uninstfalkon.setVisible(False)
             self.instfalkon.setVisible(True)
     
-        #if os.path.isfile("/usr/bin/microsoft-edge"):
-            #self.instmsedge.setVisible(False)
-            #self.uninstmsedge.setVisible(True)
-        #else:
-            #self.uninstmsedge.setVisible(False)
-            #self.instmsedge.setVisible(True)
-        self.uninstmsedge.setVisible(False)
-        self.instmsedge.setVisible(True)
+        if os.path.isfile("/usr/bin/microsoft-edge"):
+            self.instmsedge.setVisible(False)
+            self.uninstmsedge.setVisible(True)
+            ##Secret...
+            self.instmsedgeee.setVisible(False)
+        else:
+            self.uninstmsedge.setVisible(False)
+            self.instmsedge.setVisible(True)
+            ##Secret...
+            self.instmsedgeee.setVisible(True)
+            self.instmsedgeee.setDefault(True)
+            self.instmsedgeee.setFocus()
         self.instmsedge.setEnabled(False)
     
         if os.path.isfile("/usr/bin/waterfox-current"):
@@ -681,7 +696,7 @@ class BrowserManager(QMainWindow):
 
     def on_instvivaldi(self, widget):                                 
         self.begin_process()
-        self.progressbar1.move(31, 131)
+        self.progressbar1.move(11, 131)
         t = Thread(
             target=BrowserManagerManager,
             args=("vivaldi", "install", self)
@@ -690,7 +705,7 @@ class BrowserManager(QMainWindow):
 
     def on_instchrome(self, widget): 
         self.begin_process()
-        self.progressbar1.move(196, 131)
+        self.progressbar1.move(176, 131)
         t = Thread(
             target=BrowserManagerManager,
             args=("chrome", "install", self)
@@ -699,7 +714,7 @@ class BrowserManager(QMainWindow):
 
     def on_instchromium(self, widget):                               
         self.begin_process()
-        self.progressbar1.move(361, 131)
+        self.progressbar1.move(341, 131)
         t = Thread(
             target=BrowserManagerManager,
             args=("chromium", "install", self)
@@ -708,7 +723,7 @@ class BrowserManager(QMainWindow):
 
     def on_instmsedge(self, widget):                                 
         self.begin_process()
-        self.progressbar1.move(526, 131)
+        self.progressbar1.move(506, 131)
         t = Thread(
             target=BrowserManagerManager,
             args=("msedge", "install", self)
@@ -717,7 +732,7 @@ class BrowserManager(QMainWindow):
 
     def on_instfirefox(self, widget):
         self.begin_process()
-        self.progressbar1.move(691, 131)
+        self.progressbar1.move(671, 131)
         t = Thread(
             target=BrowserManagerManager,
             args=("firefox", "install", self)
@@ -726,7 +741,7 @@ class BrowserManager(QMainWindow):
 
     def on_instbrave(self, widget):                              
         self.begin_process()
-        self.progressbar1.move(31, 316)
+        self.progressbar1.move(11, 316)
         t = Thread(
             target=BrowserManagerManager,
             args=("brave", "install", self)
@@ -735,7 +750,7 @@ class BrowserManager(QMainWindow):
 
     def on_instopera(self, widget): 
         self.begin_process()
-        self.progressbar1.move(196, 316)
+        self.progressbar1.move(176, 316)
         t = Thread(
             target=BrowserManagerManager,
             args=("opera", "install", self)
@@ -744,7 +759,7 @@ class BrowserManager(QMainWindow):
 
     def on_instwaterfox(self, widget):                                 
         self.begin_process()
-        self.progressbar1.move(361, 316)
+        self.progressbar1.move(341, 316)
         t = Thread(
             target=BrowserManagerManager,
             args=("waterfox", "install", self)
@@ -753,7 +768,7 @@ class BrowserManager(QMainWindow):
 
     def on_instfalkon(self, widget):                                 
         self.begin_process()
-        self.progressbar1.move(526, 316)
+        self.progressbar1.move(506, 316)
         t = Thread(
             target=BrowserManagerManager,
             args=("falkon", "install", self)
@@ -762,7 +777,7 @@ class BrowserManager(QMainWindow):
     
     def on_instweb(self, widget):                                    
         self.begin_process()
-        self.progressbar1.move(691, 316)
+        self.progressbar1.move(671, 316)
         t = Thread(
             target=BrowserManagerManager,
             args=("web", "install", self)
@@ -771,7 +786,7 @@ class BrowserManager(QMainWindow):
 
     def on_uninstvivaldi(self, widget):                               
         self.begin_process()
-        self.progressbar1.move(31, 131)
+        self.progressbar1.move(11, 131)
         t = Thread(
             target=BrowserManagerManager,
             args=("vivaldi", "uninstall", self)
@@ -780,7 +795,7 @@ class BrowserManager(QMainWindow):
 
     def on_uninstchrome(self, widget):                                   
         self.begin_process()
-        self.progressbar1.move(196, 131)
+        self.progressbar1.move(176, 131)
         t = Thread(
             target=BrowserManagerManager,
             args=("chrome", "uninstall", self)
@@ -789,7 +804,7 @@ class BrowserManager(QMainWindow):
     
     def on_uninstchromium(self, widget):                                 
         self.begin_process()
-        self.progressbar1.move(361, 131)
+        self.progressbar1.move(341, 131)
         t = Thread(
             target=BrowserManagerManager,
             args=("chromium", "uninstall", self)
@@ -798,7 +813,7 @@ class BrowserManager(QMainWindow):
 
     def on_uninstmsedge(self, widget):                               
         self.begin_process()
-        self.progressbar1.move(526, 131)
+        self.progressbar1.move(506, 131)
         t = Thread(
             target=BrowserManagerManager,
             args=("msedge", "uninstall", self)
@@ -807,7 +822,7 @@ class BrowserManager(QMainWindow):
 
     def on_uninstfirefox(self, widget):                              
         self.begin_process()
-        self.progressbar1.move(691, 131)
+        self.progressbar1.move(671, 131)
         t = Thread(
             target=BrowserManagerManager,
             args=("firefox", "uninstall", self)
@@ -816,7 +831,7 @@ class BrowserManager(QMainWindow):
 
     def on_uninstbrave(self, widget):                                
         self.begin_process()
-        self.progressbar1.move(31, 316)
+        self.progressbar1.move(11, 316)
         t = Thread(
             target=BrowserManagerManager,
             args=("brave", "uninstall", self)
@@ -825,7 +840,7 @@ class BrowserManager(QMainWindow):
 
     def on_uninstopera(self, widget):                                
         self.begin_process()
-        self.progressbar1.move(196, 316)
+        self.progressbar1.move(176, 316)
         t = Thread(
             target=BrowserManagerManager,
             args=("opera", "uninstall", self)
@@ -834,7 +849,7 @@ class BrowserManager(QMainWindow):
 
     def on_uninstwaterfox(self, widget):                               
         self.begin_process()
-        self.progressbar1.move(361, 316)
+        self.progressbar1.move(341, 316)
         t = Thread(
             target=BrowserManagerManager,
             args=("waterfox", "uninstall", self)
@@ -843,7 +858,7 @@ class BrowserManager(QMainWindow):
 
     def on_uninstfalkon(self, widget):                               
         self.begin_process()
-        self.progressbar1.move(526, 316)
+        self.progressbar1.move(506, 316)
         t = Thread(
             target=BrowserManagerManager,
             args=("falkon", "uninstall", self)
@@ -852,7 +867,7 @@ class BrowserManager(QMainWindow):
     
     def on_uninstweb(self, widget):                                  
         self.begin_process()
-        self.progressbar1.move(691, 316)
+        self.progressbar1.move(671, 316)
         t = Thread(
             target=BrowserManagerManager,
             args=("web", "uninstall", self)
@@ -867,15 +882,15 @@ class BrowserManager(QMainWindow):
             QMessageBox.information(self, " ", "Google Chrome is an web browser project backed by Google that aims to build a safer, faster, and more stable way for all internet users to experience the web.\n\nBased on: Chromium\nMobile Version available: Yes\nExtra Repositories Added: Google Chrome's (Stable) Package Repository")
 
     def on_aboutchromium(self, widget):
-            QMessageBox.information(self, " ", "Chromium is the open source father of Google Chrome, also being mainly made by Google. It shares a lot of the GUI that Google Chrome has, but with an alternative logo and some other features missing such as codecs being pre-installed, and so on.\n\nBased on: N/A\nMobile Version available: Yes\nExtra Repositories Added: Debian Buster (just Chromium)")
+            QMessageBox.information(self, " ", "Chromium is the open source father of Google Chrome, also being mainly made by Google. It shares a lot of the GUI that Google Chrome has, but with an alternative logo and some other features missing such as codecs being pre-installed, and so on.\n\nBased on: N/A\nMobile Version available: Yes\nExtra Repositories Added: Linux Mint (only required Chromium packages)")
             pass
 
     def on_aboutmsedge(self, widget):
-            QMessageBox.information(self, " ", "Microsoft Edge is Microsoft's all-new release of the Microsoft Edge browser that was used in the latest version of their flagship Operating System. It shares a lot of similarities with the original Microsoft Edge. It also comes pre-bunded with the Bing search engine and a Start Page with Microsoft News integration.\n\nBased on: Chromium\nMobile Version available: Yes\nExtra Repositories Added: Coming Soon")
+            QMessageBox.information(self, " ", "Microsoft Edge is Microsoft's all-new release of the Microsoft Edge browser that was used in the latest version of their flagship Operating System. It shares a lot of similarities with the original Microsoft Edge. It also comes pre-bunded with the Bing search engine and a Start Page with Microsoft News integration.\n\nBased on: Chromium\nMobile Version available: Yes\nExtra Repositories Added: Microsoft Edge's Package Repository")
             pass
 
     def on_aboutfirefox(self, widget):
-            QMessageBox.information(self, " ", "Firefox delivers safe and easy web browsing with a familiar user interface, thousands of plugins, and integrated search that lets you get the most out of the web.\n\nBased on: N/A\nMobile Version available: Yes\nExtra Repositories Added: None")
+            QMessageBox.information(self, " ", "Firefox delivers safe and easy web browsing with a familiar user interface, thousands of plugins, and integrated search that lets you get the most out of the web.\n\nBased on: N/A\nMobile Version available: Yes\nExtra Repositories Added: Flathub (Flatpak)")
 
     def on_aboutbrave(self, widget):
             QMessageBox.information(self, " ", "Brave is yet another freeware browser based on the Chromium codebase, and Blink Engine. Brave is open-source, and is designed to block Ads and Website Trackers by default, with a Donate to Support Your Favourite Websites mindset.\n\nBased on: Chromium\nMobile Version available: Yes\nExtra Repositories Added: Brave Browser's Package Repository")

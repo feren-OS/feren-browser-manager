@@ -3,13 +3,11 @@
 ###############################
 #Check if program is installed#
 ###############################
-dpkg -l firefox |grep -q ^ii
+flatpak list | grep org.mozilla.firefox
 
 if [ $? -eq 0 ]; then
-         if [ -e "/usr/bin/firefox" ]; then
-                  zenity --info --title="Information" --text="Mozilla Firefox is already installed" --no-wrap &
-                  exit 0
-         fi
+    zenity --info --title="Information" --text="Mozilla Firefox is already installed" --no-wrap &
+    exit 0
 fi
 
 
@@ -35,7 +33,10 @@ are you sure you want to install Mozilla Firefox?" --no-wrap
     ######################
     #Double Check Package#
     ######################
-    if [ -e "/usr/bin/firefox" ]; then
+    flatpak list | grep org.mozilla.firefox
+    if [ $? -eq 0 ]; then
+            /usr/bin/feren-flatpak-themelock-check &
+            /usr/bin/feren-flatpak-themelock org.mozilla.firefox
             zenity --info --title="Installation Complete" --text="Mozilla Firefox was successfully installed" --no-wrap &
             exit 0
     fi
@@ -51,10 +52,9 @@ fi
 ###################################
 #Check if program is not installed#
 ###################################
-dpkg -l firefox |grep -q ^ii
+flatpak list | grep org.mozilla.firefox
 
 if [ ! $? -eq 0 ]; then
-         if [ ! -e "/usr/bin/firefox" ]; then
 
 #################
 #Install program#
@@ -62,10 +62,9 @@ if [ ! $? -eq 0 ]; then
         #Log output
         exec 1>/tmp/firefox-install-log 2>&1
         
-                  apt-get update
-                  apt-get -y install firefox
-         fi
-         exit
+        apt-get update
+        apt-get -y install flatpak feren-flatpak-management firefox-flatpak
+        exit
 fi
 
 #######

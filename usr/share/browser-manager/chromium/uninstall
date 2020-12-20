@@ -62,8 +62,8 @@ if [ $? -eq 0 ]; then
         #Log output
         exec 1>/tmp/chromium-removal-log 2>&1
         
-                  apt-get -y remove chromium
-                  rm -f /etc/apt/preferences.d/debian-only-chromium.pref /etc/apt/sources.list.d/debian-buster.list
+                  apt-get -y remove chromium linuxmint-keyring
+                  rm -f /etc/apt/preferences.d/lm-only-chromium.pref /etc/apt/sources.list.d/linux-mint.list
          fi
          exit
 fi

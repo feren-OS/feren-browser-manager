@@ -58,42 +58,26 @@ if [ ! $? -eq 0 ]; then
         #Log output
         exec 1>/tmp/chromium-install-log 2>&1
         
-        #Add Debian Buster's repository and restrict it to just chromium
-        apt-key adv --keyserver hkps://keyserver.ubuntu.com:443 --recv-keys DCC9EFBF77E11517
-        apt-key adv --keyserver hkps://keyserver.ubuntu.com:443 --recv-keys 648ACFD622F3D138
-        apt-key adv --keyserver hkps://keyserver.ubuntu.com:443 --recv-keys 112695A0E562B32A
-        echo "deb https://deb.debian.org/debian buster main
-deb https://deb.debian.org/debian buster-updates main
-deb http://security.debian.org/ buster/updates main" > /etc/apt/sources.list.d/debian-buster.list
-        echo '# Do not install anything other than chromium from the Debian repos
+        #Add Linux Mint's repository and restrict it to just chromium
+        wget http://packages.linuxmint.com/pool/main/l/linuxmint-keyring/linuxmint-keyring_2016.05.26_all.deb -O /tmp/linuxmint-keyring.deb
+        dpkg -i /tmp/linuxmint-keyring.deb
+        rm -f /tmp/linuxmint-keyring.deb
+        apt-get -f install -y
+        echo "deb http://packages.linuxmint.com ulyana main upstream #id:linuxmint_main" > /etc/apt/sources.list.d/linux-mint.list
+        echo '# Do not install anything other than allowed packages from the Linux Mint repos
 Package: *
-Pin: origin "deb.debian.org"
-Pin-Priority: 1
-
-# Do not install anything other than chromium from the Debian repos
-Package: *
-Pin: origin "security.debian.org"
-Pin-Priority: 1
-
-# Exclude the game chromium-bsu
-Package: chromium-bsu*
-Pin: origin "deb.debian.org"
-Pin-Priority: 1
-
-# Exclude the game chromium-bsu
-Package: chromium-bsu*
-Pin: origin "security.debian.org"
-Pin-Priority: 1
+Pin: origin "packages.linuxmint.com"
+Pin-Priority: -10
 
 # Pattern includes "chromium"
 Package: chromium*
-Pin: origin "deb.debian.org"
+Pin: origin "packages.linuxmint.com"
 Pin-Priority: 700
 
-# Pattern includes "chromium"
-Package: chromium*
-Pin: origin "security.debian.org"
-Pin-Priority: 700' > /etc/apt/preferences.d/debian-only-chromium.pref
+# Is package "linuxmint-keyring"
+Package: linuxmint-keyring
+Pin: origin "packages.linuxmint.com"
+Pin-Priority: 700' > /etc/apt/preferences.d/lm-only-chromium.pref
         
                   apt-get update
                   apt-get -y install chromium
